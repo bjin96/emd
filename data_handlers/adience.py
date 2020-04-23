@@ -3,6 +3,8 @@ from typing import List, Tuple
 
 import pandas as pd
 
+from data_handlers.generators import Y_COLUMN, X_COLUMN
+
 FOLD_DIR = Path('./datasets/adience/')
 FOLD_0_FILE = FOLD_DIR / Path('fold_0_data.csv')
 FOLD_1_FILE = FOLD_DIR / Path('fold_1_data.csv')
@@ -48,10 +50,20 @@ def preprocess_info_file(
         filepath_or_buffer=info_file,
         sep='\t'
     )
-    info['x_col'] = IMAGES_DIR + info['user_id'] + '/' + IMAGES_PREFIX + info['original_image']
-    info['y_col'] = info['age']
+    info[X_COLUMN] = build_image_path_series(info=info)
+    info[Y_COLUMN] = info['age']
     return info.drop(
         labels=['user_id', 'original_image', 'face_id', 'gender', 'age', 'x', 'y', 'dx', 'dy', 'tilt_ang',
                 'fiducial_yaw_angle', 'fiducial_score'],
         axis='columns'
+    )
+
+
+def build_image_path_series(
+        info: pd.DataFrame
+) -> pd.Series:
+    return pd.Series(
+        data=IMAGES_DIR + info['user_id'] + '/' + IMAGES_PREFIX + info['face_id'].astype(str)
+        + '.' + info['original_image'],
+        name=X_COLUMN
     )
