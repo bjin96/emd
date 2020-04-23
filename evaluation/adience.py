@@ -5,8 +5,8 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.callbacks import ModelCheckpoint
 
-from data_handlers.adience import get_adience_info, ADIENCE_NUMBER_OF_CLASSES, ADIENCE_TRAIN_FOLDS_INFO_FILES, \
-    ADIENCE_VALIDATION_FOLDS_INFO_FILES
+from data_handlers.adience import get_adience_info, ADIENCE_TRAIN_FOLDS_INFO_FILES, \
+    ADIENCE_VALIDATION_FOLDS_INFO_FILES, ADIENCE_CLASSES
 from data_handlers.generators import get_generators
 from loss_functions.emd import earth_mover_distance
 from models.vgg import get_model
@@ -20,7 +20,7 @@ def evaluate_adience_vgg():
     model = get_model(
         loss_function=earth_mover_distance,
         learning_rate=LEARNING_RATES[0],
-        number_of_classes=ADIENCE_NUMBER_OF_CLASSES
+        number_of_classes=len(ADIENCE_CLASSES)
     )
     evaluate_adience_folds(
         model=model

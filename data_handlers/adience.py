@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import List, Tuple
 
 import pandas as pd
+import numpy as np
 
 from data_handlers.generators import Y_COLUMN, X_COLUMN
 
@@ -29,7 +30,7 @@ ADIENCE_VALIDATION_FOLDS_INFO_FILES = [
 IMAGES_DIR = './datasets/adience/faces/'
 IMAGES_PREFIX = 'coarse_tilt_aligned_face.'
 
-ADIENCE_NUMBER_OF_CLASSES = 8
+ADIENCE_CLASSES = ["(0, 2)", "(4, 6)", "(8, 12)", "(15, 20)", "(25, 32)", "(38, 43)", "(48, 53)", "(60, 100)"]
 
 
 def get_adience_info(
@@ -51,12 +52,14 @@ def preprocess_info_file(
         sep='\t'
     )
     info[X_COLUMN] = build_image_path_series(info=info)
-    info[Y_COLUMN] = info['age']
-    return info.drop(
-        labels=['user_id', 'original_image', 'face_id', 'gender', 'age', 'x', 'y', 'dx', 'dy', 'tilt_ang',
-                'fiducial_yaw_angle', 'fiducial_score'],
-        axis='columns'
-    )
+    info[Y_COLUMN] = fix_outlier_labels(labels=info['age'])
+    return info \
+        .drop(
+            labels=['user_id', 'original_image', 'face_id', 'gender', 'age', 'x', 'y', 'dx', 'dy', 'tilt_ang',
+                    'fiducial_yaw_angle', 'fiducial_score'],
+            axis='columns'
+        ) \
+        .dropna()
 
 
 def build_image_path_series(
@@ -66,4 +69,20 @@ def build_image_path_series(
         data=IMAGES_DIR + info['user_id'] + '/' + IMAGES_PREFIX + info['face_id'].astype(str)
         + '.' + info['original_image'],
         name=X_COLUMN
+    )
+
+
+def fix_outlier_labels(
+        labels: pd.Series
+) -> pd.Series:
+    outlier_class_mapping = {
+        '35': ADIENCE_CLASSES[5], '3': ADIENCE_CLASSES[0], '55': ADIENCE_CLASSES[7], '58': ADIENCE_CLASSES[7],
+        '22': ADIENCE_CLASSES[3], '13': ADIENCE_CLASSES[2], '45': ADIENCE_CLASSES[5], '36': ADIENCE_CLASSES[5],
+        '23': ADIENCE_CLASSES[4], '57': ADIENCE_CLASSES[7], '56': ADIENCE_CLASSES[6], '2': ADIENCE_CLASSES[0],
+        '29': ADIENCE_CLASSES[4], '34': ADIENCE_CLASSES[4], '42': ADIENCE_CLASSES[5], '46': ADIENCE_CLASSES[6],
+        '32': ADIENCE_CLASSES[4], '(38, 48)': ADIENCE_CLASSES[5], '(38, 42)': ADIENCE_CLASSES[5],
+        '(8, 23)': ADIENCE_CLASSES[2], '(27, 32)': ADIENCE_CLASSES[4], 'None': np.nan
+    }
+    return labels.replace(
+        to_replace=outlier_class_mapping
     )
