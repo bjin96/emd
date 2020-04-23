@@ -73,7 +73,7 @@ def evaluate(
         validation_steps=35,
         callbacks=[
             ModelCheckpoint(
-                filepath=checkpoint_file,
+                filepath=str(checkpoint_file),
                 monitor='val_acc',
                 verbose=1,
                 save_best_only=True,
