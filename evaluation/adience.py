@@ -65,7 +65,7 @@ def evaluate(
         validation_generator: ImageDataGenerator,
         checkpoint_file: Path
 ) -> None:
-    model.fit_generator(
+    model.fit(
         train_generator,
         steps_per_epoch=350,
         epochs=20,
