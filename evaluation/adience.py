@@ -67,10 +67,8 @@ def evaluate(
 ) -> None:
     model.fit(
         train_generator,
-        steps_per_epoch=350,
         epochs=20,
         validation_data=validation_generator,
-        validation_steps=35,
         callbacks=[
             ModelCheckpoint(
                 filepath=str(checkpoint_file),
