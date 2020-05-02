@@ -20,11 +20,13 @@ def get_generators(
     )
     train_generator = generator.flow_from_dataframe(
         dataframe=train_info,
+        target_size=(227, 227),
         x_col=X_COLUMN,
         y_col=Y_COLUMN
     )
     validation_generator = generator.flow_from_dataframe(
         dataframe=validation_info,
+        target_size=(227, 227),
         x_col=X_COLUMN,
         y_col=Y_COLUMN
     )

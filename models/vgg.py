@@ -16,7 +16,7 @@ def get_model(
 ) -> Model:
     vgg = VGG16(
         include_top=False,
-        input_shape=(400, 400, 3),
+        input_shape=(227, 227, 3),
         pooling='avg'
     )
     model = Sequential()

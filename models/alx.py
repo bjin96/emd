@@ -17,7 +17,7 @@ def get_alxs(
 ):
     model = Sequential()
     model.add(Conv2D(
-        input_shape=(400, 400, 3),
+        input_shape=(227, 227, 3),
         filters=96,
         kernel_size=(7, 7),
         activation=relu
