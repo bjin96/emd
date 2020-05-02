@@ -6,7 +6,7 @@ from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Flatten, Dense, Dropout
 from tensorflow.keras.optimizers import SGD
 
-OPTIMIZER_MOMENTUM = 0.98
+from models.constants import OPTIMIZER_MOMENTUM
 
 
 def get_model(

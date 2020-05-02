@@ -9,9 +9,9 @@ from data_handlers.adience import get_adience_info, ADIENCE_TRAIN_FOLDS_INFO_FIL
     ADIENCE_VALIDATION_FOLDS_INFO_FILES, ADIENCE_CLASSES
 from data_handlers.generators import get_generators
 from loss_functions.emd import earth_mover_distance
+from models.constants import LEARNING_RATES
 from models.vgg import get_model
 
-LEARNING_RATES = [10 ** -1.5, 10 ** -2, 10 ** -2.5, 10 ** -3, 10 ** -3.5, 10 ** -4, 10 ** -4.5]
 CHECKPOINTS_DIR = Path('./checkpoints/')
 ADIENCE_CHECKPOINT_FILE = CHECKPOINTS_DIR / Path('adience_checkpoint.h5')
 
@@ -19,7 +19,7 @@ ADIENCE_CHECKPOINT_FILE = CHECKPOINTS_DIR / Path('adience_checkpoint.h5')
 def evaluate_adience_vgg():
     model = get_model(
         loss_function=earth_mover_distance,
-        learning_rate=LEARNING_RATES[0],
+        learning_rate=LEARNING_RATES[5],
         number_of_classes=len(ADIENCE_CLASSES)
     )
     evaluate_adience_folds(
