@@ -1,4 +1,4 @@
-from tensorflow.keras import backend as K
+from keras import backend as K
 
 
 def earth_mover_distance(

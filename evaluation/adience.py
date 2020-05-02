@@ -1,10 +1,10 @@
 from pathlib import Path
 from typing import List
 
-from keras.backend import categorical_crossentropy
-from tensorflow.keras.models import Model
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.callbacks import ModelCheckpoint
+from keras.losses import categorical_crossentropy
+from keras.models import Model
+from keras.preprocessing.image import ImageDataGenerator
+from keras.callbacks import ModelCheckpoint
 
 from data_handlers.adience import get_adience_info, ADIENCE_TRAIN_FOLDS_INFO_FILES, \
     ADIENCE_VALIDATION_FOLDS_INFO_FILES, ADIENCE_CLASSES

@@ -3,7 +3,7 @@ from typing import Callable
 import keras.backend as K
 
 from keras import Sequential
-from keras.layers import Conv2D, MaxPool2D, Flatten, Dense, Dropout, Layer, normalization
+from keras.layers import Conv2D, MaxPool2D, Flatten, Dense, Dropout, Layer
 from keras.activations import relu, softmax
 from keras.optimizers import SGD
 

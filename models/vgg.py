@@ -1,10 +1,10 @@
 from typing import Callable
 
 from tensorflow.keras.applications.vgg16 import VGG16
-from tensorflow.keras.models import Model
-from tensorflow.keras import Sequential
-from tensorflow.keras.layers import Flatten, Dense, Dropout
-from tensorflow.keras.optimizers import SGD
+from keras.models import Model
+from keras import Sequential
+from keras.layers import Flatten, Dense, Dropout
+from keras.optimizers import SGD
 
 from models.constants import OPTIMIZER_MOMENTUM
 
