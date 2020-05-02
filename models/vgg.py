@@ -3,7 +3,7 @@ from typing import Callable
 from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.models import Model
 from tensorflow.keras import Sequential
-from tensorflow.keras.layers import Flatten, Dense
+from tensorflow.keras.layers import Flatten, Dense, Dropout
 from tensorflow.keras.optimizers import SGD
 
 OPTIMIZER_MOMENTUM = 0.98
@@ -16,12 +16,16 @@ def get_model(
 ) -> Model:
     vgg = VGG16(
         include_top=False,
-        input_shape=(224, 224, 3),
+        input_shape=(400, 400, 3),
         pooling='avg'
     )
     model = Sequential()
     model.add(vgg)
     model.add(Flatten())
+    model.add(Dense(128, activation='relu'))
+    model.add(Dropout(0.2))
+    model.add(Dense(128, activation='relu'))
+    model.add(Dropout(0.2))
     model.add(Dense(number_of_classes, activation='softmax'))
     model.compile(
         loss=loss_function,
