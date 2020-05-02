@@ -18,7 +18,7 @@ CHECKPOINTS_DIR = Path('./checkpoints/')
 ADIENCE_CHECKPOINT_FILE = CHECKPOINTS_DIR / Path('adience_checkpoint.h5')
 
 
-def evaluate_adience_vgg():
+def evaluate_adience_vgg() -> None:
     model = get_model(
         loss_function=earth_mover_distance,
         learning_rate=LEARNING_RATES[5],
@@ -29,7 +29,7 @@ def evaluate_adience_vgg():
     )
 
 
-def evaluate_adience_alxs():
+def evaluate_adience_alxs() -> None:
     model = get_alxs(
         loss_function=categorical_crossentropy,
         learning_rate=LEARNING_RATES[5],

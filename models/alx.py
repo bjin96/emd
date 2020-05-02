@@ -2,7 +2,7 @@ from typing import Callable
 
 import keras.backend as K
 
-from keras import Sequential
+from keras.models import Sequential, Model
 from keras.layers import Conv2D, MaxPool2D, Flatten, Dense, Dropout, Layer
 from keras.activations import relu, softmax
 from keras.optimizers import SGD
@@ -14,7 +14,7 @@ def get_alxs(
         loss_function: Callable,
         learning_rate: float,
         number_of_classes: int
-):
+) -> Model:
     model = Sequential()
     model.add(Conv2D(
         input_shape=(227, 227, 3),

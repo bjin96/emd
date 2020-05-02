@@ -1,8 +1,7 @@
 from typing import Callable
 
 from tensorflow.keras.applications.vgg16 import VGG16
-from keras.models import Model
-from keras import Sequential
+from keras.models import Sequential, Model
 from keras.layers import Flatten, Dense, Dropout
 from keras.optimizers import SGD
 
