@@ -11,9 +11,11 @@ def get_generators(
         train_info: pd.DataFrame,
         validation_info: pd.DataFrame,
 ) -> Tuple[ImageDataGenerator, ImageDataGenerator]:
+    # no adjustment of aspect ratio
     generator = ImageDataGenerator(
         rotation_range=20,
-        horizontal_flip=True
+        horizontal_flip=True,
+        channel_shift_range=10.
     )
     train_generator = generator.flow_from_dataframe(
         dataframe=train_info,
