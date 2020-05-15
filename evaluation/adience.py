@@ -45,12 +45,11 @@ def evaluate_adience_alxs(
 def evaluate_adience_folds(
         model: Model
 ) -> None:
-    for i in range(len(ADIENCE_TRAIN_FOLDS_INFO_FILES)):
-        evaluate_adience_fold(
-            model=model,
-            train_fold_info_files=ADIENCE_TRAIN_FOLDS_INFO_FILES[i],
-            validation_fold_info_file=ADIENCE_VALIDATION_FOLDS_INFO_FILES[i]
-        )
+    evaluate_adience_fold(
+        model=model,
+        train_fold_info_files=ADIENCE_TRAIN_FOLDS_INFO_FILES[0],
+        validation_fold_info_file=ADIENCE_VALIDATION_FOLDS_INFO_FILES[0]
+    )
 
 
 def evaluate_adience_fold(
