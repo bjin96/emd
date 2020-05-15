@@ -5,3 +5,5 @@ datasets/
 __pycache__/
 
 checkpoints/
+
+logs/
