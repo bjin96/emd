@@ -19,27 +19,29 @@ ADIENCE_CHECKPOINT_FILE = CHECKPOINTS_DIR / Path('adience_checkpoint.h5')
 def evaluate_adience_vgg(
         loss_function: Callable
 ) -> None:
-    model = get_model(
-        loss_function=loss_function,
-        learning_rate=LEARNING_RATES[5],
-        number_of_classes=len(ADIENCE_CLASSES)
-    )
-    evaluate_adience_folds(
-        model=model
-    )
+    for learning_rate in LEARNING_RATES:
+        model = get_model(
+            loss_function=loss_function,
+            learning_rate=learning_rate,
+            number_of_classes=len(ADIENCE_CLASSES)
+        )
+        evaluate_adience_folds(
+            model=model
+        )
 
 
 def evaluate_adience_alxs(
         loss_function: Callable
 ) -> None:
-    model = get_alxs(
-        loss_function=loss_function,
-        learning_rate=LEARNING_RATES[5],
-        number_of_classes=len(ADIENCE_CLASSES)
-    )
-    evaluate_adience_folds(
-        model=model
-    )
+    for learning_rate in LEARNING_RATES:
+        model = get_alxs(
+            loss_function=loss_function,
+            learning_rate=learning_rate,
+            number_of_classes=len(ADIENCE_CLASSES)
+        )
+        evaluate_adience_folds(
+            model=model
+        )
 
 
 def evaluate_adience_folds(
