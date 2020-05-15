@@ -15,9 +15,6 @@ from models.alx import get_alxs
 from models.constants import LEARNING_RATES
 from models.vgg import get_model
 
-CHECKPOINTS_DIR = Path('./checkpoints/')
-ADIENCE_CHECKPOINT_FILE = CHECKPOINTS_DIR / Path('adience_checkpoint.h5')
-
 
 def evaluate_adience_vgg(
         loss_function: Callable
