@@ -13,14 +13,14 @@ from data_handlers.generators import get_generators
 from evaluation.logging import get_checkpoint_file, get_tensorboard_callback
 from models.alx import get_alxs
 from models.constants import LEARNING_RATES
-from models.vgg import get_model
+from models.vgg import get_vgg_f
 
 
-def evaluate_adience_vgg(
+def evaluate_adience_vgg_f(
         loss_function: Callable
 ) -> None:
     for learning_rate in LEARNING_RATES:
-        model = get_model(
+        model = get_vgg_f(
             loss_function=loss_function,
             learning_rate=learning_rate,
             number_of_classes=len(ADIENCE_CLASSES)

@@ -8,7 +8,7 @@ from tensorflow.keras.applications.vgg16 import VGG16
 from models.constants import OPTIMIZER_MOMENTUM
 
 
-def get_model(
+def get_vgg_f(
         loss_function: Callable,
         learning_rate: float,
         number_of_classes: int
