@@ -1,9 +1,9 @@
 from typing import Callable
 
-from keras.models import Sequential, Model
-from keras.layers import Dense, Dropout
-from keras.optimizers import SGD
-from keras.applications.vgg16 import VGG16
+from tensorflow.keras.models import Sequential, Model
+from tensorflow.keras.layers import Dense, Dropout
+from tensorflow.keras.optimizers import SGD
+from tensorflow.keras.applications.vgg16 import VGG16
 
 from models.constants import OPTIMIZER_MOMENTUM
 

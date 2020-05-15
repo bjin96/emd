@@ -2,7 +2,7 @@ from typing import Tuple
 
 import pandas as pd
 
-from keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 X_COLUMN = 'x_col'
 Y_COLUMN = 'y_col'

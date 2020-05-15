@@ -1,11 +1,11 @@
 from typing import Callable
 
-import keras.backend as K
+import tensorflow.keras.backend as K
 
-from keras.models import Sequential, Model
-from keras.layers import Conv2D, MaxPool2D, Flatten, Dense, Dropout, Layer
-from keras.activations import relu, softmax
-from keras.optimizers import SGD
+from tensorflow.keras.models import Sequential, Model
+from tensorflow.keras.layers import Conv2D, MaxPool2D, Flatten, Dense, Dropout, Layer
+from tensorflow.keras.activations import relu, softmax
+from tensorflow.keras.optimizers import SGD
 
 from models.constants import OPTIMIZER_MOMENTUM
 
