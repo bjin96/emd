@@ -1,7 +1,6 @@
 from pathlib import Path
-from typing import List
+from typing import List, Callable
 
-from tensorflow.keras.losses import categorical_crossentropy
 from tensorflow.keras.models import Model
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.callbacks import ModelCheckpoint
@@ -9,7 +8,6 @@ from tensorflow.keras.callbacks import ModelCheckpoint
 from data_handlers.adience import get_adience_info, ADIENCE_TRAIN_FOLDS_INFO_FILES, \
     ADIENCE_VALIDATION_FOLDS_INFO_FILES, ADIENCE_CLASSES
 from data_handlers.generators import get_generators
-from loss_functions.emd import earth_mover_distance
 from models.alx import get_alxs
 from models.constants import LEARNING_RATES
 from models.vgg import get_model
@@ -18,9 +16,11 @@ CHECKPOINTS_DIR = Path('./checkpoints/')
 ADIENCE_CHECKPOINT_FILE = CHECKPOINTS_DIR / Path('adience_checkpoint.h5')
 
 
-def evaluate_adience_vgg() -> None:
+def evaluate_adience_vgg(
+        loss_function: Callable
+) -> None:
     model = get_model(
-        loss_function=earth_mover_distance,
+        loss_function=loss_function,
         learning_rate=LEARNING_RATES[5],
         number_of_classes=len(ADIENCE_CLASSES)
     )
@@ -29,9 +29,11 @@ def evaluate_adience_vgg() -> None:
     )
 
 
-def evaluate_adience_alxs() -> None:
+def evaluate_adience_alxs(
+        loss_function: Callable
+) -> None:
     model = get_alxs(
-        loss_function=categorical_crossentropy,
+        loss_function=loss_function,
         learning_rate=LEARNING_RATES[5],
         number_of_classes=len(ADIENCE_CLASSES)
     )
