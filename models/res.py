@@ -67,7 +67,8 @@ class ConvolutionBlock(BasicLayer):
             Conv2D(
                 filters=filters * k,
                 kernel_size=kernel_size,
-                strides=stride
+                strides=stride,
+                padding='same'
             )
         ]
 
