@@ -107,7 +107,7 @@ class Group(BasicLayer):
 
     def __init__(self, n, filters, stride=1, activation=ReLU, k=1, **kwargs):
         super(Group, self).__init__(**kwargs)
-        self.sub_layers = BottleneckBlock(filters, stride, activation, k)
+        self.sub_layers = [BottleneckBlock(filters, stride, activation, k)]
         self.sub_layers.extend([BottleneckBlock(filters, activation=activation, k=k) for _ in range(n - 1)])
 
     def call(self, inputs, **kwargs):
