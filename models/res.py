@@ -4,8 +4,9 @@ import numpy as np
 
 from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.activations import relu
-from tensorflow.keras.layers import Conv2D, Layer, BatchNormalization, Dropout, Dense, ReLU
+from tensorflow.keras.layers import Conv2D, Layer, BatchNormalization, Dropout, Dense, ReLU, Flatten
 from tensorflow.keras.models import Model, Sequential
+from tensorflow import TensorShape
 
 from models.constants import OPTIMIZER_MOMENTUM
 
@@ -47,8 +48,12 @@ def get_res_f(
 
 class BasicLayer(Layer):
 
-    def __init__(self, **kwargs):
+    def __init__(self, sub_layers, stride, filters, k, **kwargs):
         super(BasicLayer, self).__init__(**kwargs)
+        self.sub_layers = sub_layers
+        self.stride = stride
+        self.filters = filters
+        self.k = k
 
     def call(self, inputs, **kwargs):
         x = self.sub_layers[0](inputs)
@@ -57,69 +62,93 @@ class BasicLayer(Layer):
         return x
 
     def compute_output_shape(self, input_shape):
-        return (
+        return TensorShape((
             input_shape[0],
             input_shape[1] // self.stride,
             input_shape[2] // self.stride,
             self.filters * self.k
-        )
+        ))
 
 
 class ConvolutionBlock(BasicLayer):
 
     def __init__(self, filters, kernel_size, stride=1, activation=ReLU, k=1, **kwargs):
-        super(ConvolutionBlock, self).__init__(**kwargs)
-        self.sub_layers = [
-            BatchNormalization(),
-            activation(),
-            Conv2D(
-                filters=filters * k,
-                kernel_size=kernel_size,
-                strides=stride,
-                padding='same'
-            )
-        ]
+        super(ConvolutionBlock, self).__init__(
+            sub_layers=[
+                BatchNormalization(),
+                activation(),
+                Conv2D(
+                    filters=filters * k,
+                    kernel_size=kernel_size,
+                    strides=stride,
+                    padding='same'
+                )
+            ],
+            stride=stride,
+            filters=filters,
+            k=k,
+            **kwargs
+        )
 
     def call(self, inputs, **kwargs):
         super(ConvolutionBlock, self).call(inputs, **kwargs)
+
+    def compute_output_shape(self, input_shape):
+        super(ConvolutionBlock, self).compute_output_shape(input_shape)
 
 
 class BottleneckBlock(BasicLayer):
 
     def __init__(self, filters, stride=1, activation=ReLU, k=1, **kwargs):
-        super(BottleneckBlock, self).__init__(**kwargs)
-        self.sub_layers = [
-            ConvolutionBlock(
-                filters=filters * k,
-                kernel_size=(1, 1),
-                stride=stride,
-                activation=activation
-            ),
-            ConvolutionBlock(
-                filters=filters * k,
-                kernel_size=(3, 3),
-                activation=activation
-            ),
-            ConvolutionBlock(
-                filters=filters * k,
-                kernel_size=(1, 1),
-                activation=activation
-            )
-        ]
+        super(BottleneckBlock, self).__init__(
+            sub_layers=[
+                ConvolutionBlock(
+                    filters=filters * k,
+                    kernel_size=(1, 1),
+                    stride=stride,
+                    activation=activation
+                ),
+                ConvolutionBlock(
+                    filters=filters * k,
+                    kernel_size=(3, 3),
+                    activation=activation
+                ),
+                ConvolutionBlock(
+                    filters=filters * k,
+                    kernel_size=(1, 1),
+                    activation=activation
+                )
+            ],
+            stride=stride,
+            filters=filters,
+            k=k,
+            **kwargs
+        )
 
     def call(self, inputs, **kwargs):
         super(BottleneckBlock, self).call(inputs, **kwargs)
+
+    def compute_output_shape(self, input_shape):
+        super(BottleneckBlock, self).compute_output_shape(input_shape)
 
 
 class Group(BasicLayer):
 
     def __init__(self, n, filters, stride=1, activation=ReLU, k=1, **kwargs):
-        super(Group, self).__init__(**kwargs)
-        self.sub_layers = [BottleneckBlock(filters, stride, activation, k)]
-        self.sub_layers.extend([BottleneckBlock(filters, activation=activation, k=k) for _ in range(n - 1)])
+        super(Group, self).__init__(
+            sub_layers=[BottleneckBlock(filters, stride, activation, k)]
+            + [BottleneckBlock(filters, activation=activation, k=k) for _ in range(n - 1)],
+            stride=stride,
+            filters=filters,
+            k=k,
+            **kwargs
+        )
 
     def call(self, inputs, **kwargs):
         super(Group, self).call(inputs, **kwargs)
+
+    def compute_output_shape(self, input_shape):
+        super(Group, self).compute_output_shape(input_shape)
 
 
 class WideResidualNetwork(Model):
@@ -154,9 +183,9 @@ class WideResidualNetwork(Model):
 
     def compute_output_shape(self, input_shape):
         stride_product = np.product(WideResidualNetwork.STRIDES)
-        return (
+        return TensorShape((
             input_shape[0],
             input_shape[1] // stride_product,
             input_shape[2] // stride_product,
             WideResidualNetwork.FILTER_SIZES[-1]
-        )
+        ))
