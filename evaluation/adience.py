@@ -13,6 +13,7 @@ from data_handlers.generators import get_generators
 from evaluation.logging import get_checkpoint_file, get_tensorboard_callback
 from models.alx import get_alxs
 from models.constants import LEARNING_RATES
+from models.res import get_res
 from models.vgg import get_vgg_f
 
 
@@ -43,6 +44,28 @@ def evaluate_adience_alxs(
 ) -> None:
     for learning_rate in LEARNING_RATES:
         model = get_alxs(
+            loss_function=loss_function,
+            learning_rate=learning_rate,
+            number_of_classes=len(ADIENCE_CLASSES)
+        )
+        evaluate_adience_folds(
+            model=model,
+            checkpoint_callback=get_checkpoint_file(
+                data_set_name=DatasetName.ADIENCE,
+                learning_rate=learning_rate
+            ),
+            tensorboard_callback=get_tensorboard_callback(
+                data_set_name=DatasetName.ADIENCE,
+                learning_rate=learning_rate
+            )
+        )
+
+
+def evaluate_adience_res(
+        loss_function: Callable
+) -> None:
+    for learning_rate in LEARNING_RATES:
+        model = get_res(
             loss_function=loss_function,
             learning_rate=learning_rate,
             number_of_classes=len(ADIENCE_CLASSES)
