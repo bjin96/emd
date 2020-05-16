@@ -178,7 +178,7 @@ class WideResidualNetwork(Model):
             )
             for i in range(len(WideResidualNetwork.FILTER_SIZES))
         ])
-        self.groups.append(AvgPool2D)
+        self.groups.append(AvgPool2D(pool_size=(8, 8)))
 
     def call(self, inputs, **kwargs):
         x = self.groups[0](inputs)
