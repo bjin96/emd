@@ -20,30 +20,36 @@ def get_alxs(
         input_shape=(227, 227, 3),
         filters=96,
         kernel_size=(7, 7),
+        strides=4,
         activation=relu
     ))
     model.add(MaxPool2D(
         pool_size=(3, 3),
+        padding='same',
         strides=2
     ))
     model.add(LocalResponseNormalization())
     model.add(Conv2D(
         filters=256,
         kernel_size=(5, 5),
+        padding='same',
         activation=relu
     ))
     model.add(MaxPool2D(
         pool_size=(3, 3),
+        padding='same',
         strides=2
     ))
     model.add(LocalResponseNormalization())
     model.add(Conv2D(
         filters=384,
         kernel_size=(3, 3),
+        padding='same',
         activation=relu
     ))
     model.add(MaxPool2D(
         pool_size=(3, 3),
+        padding='same',
         strides=2
     ))
     model.add(Flatten())
