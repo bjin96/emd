@@ -120,7 +120,7 @@ class WideResidualNetwork(Model):
     STRIDES = [1, 2, 2]
 
     def __init__(self, group_size, activation=ReLU, k=1, **kwargs):
-        super(WideResidualNetwork, self).__init__(**kwargs)
+        super(WideResidualNetwork, self).__init__(dynamic=True, **kwargs)
         self.groups = [
             Conv2D(
                 filters=WideResidualNetwork.FILTER_SIZES[0],
