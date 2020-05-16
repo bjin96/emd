@@ -1,10 +1,10 @@
 from typing import Callable
 
-import tensorflow.keras.backend as K
+import numpy as np
 
 from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.activations import relu
-from tensorflow.keras.layers import Conv2D, Layer, ReLU, BatchNormalization, Dropout, Dense
+from tensorflow.keras.layers import Conv2D, Layer, BatchNormalization, Dropout, Dense, ReLU
 from tensorflow.keras.models import Model, Sequential
 
 from models.constants import OPTIMIZER_MOMENTUM
@@ -55,6 +55,14 @@ class BasicLayer(Layer):
         for layer in self.sub_layers[1:]:
             x = layer(x)
         return x
+
+    def compute_output_shape(self, input_shape):
+        return (
+            input_shape[0],
+            input_shape[1] // self.stride,
+            input_shape[2] // self.stride,
+            self.filters * self.k
+        )
 
 
 class ConvolutionBlock(BasicLayer):
@@ -144,3 +152,12 @@ class WideResidualNetwork(Model):
         for group in self.groups[1:]:
             x = group(x)
         return x
+
+    def compute_output_shape(self, input_shape):
+        stride_product = np.product(WideResidualNetwork.STRIDES)
+        return (
+            input_shape[0],
+            input_shape[1] // stride_product,
+            input_shape[2] // stride_product,
+            WideResidualNetwork.FILTER_SIZES[-1]
+        )
