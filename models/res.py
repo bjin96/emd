@@ -92,10 +92,10 @@ class ConvolutionBlock(BasicLayer):
         )
 
     def call(self, inputs, **kwargs):
-        super(ConvolutionBlock, self).call(inputs, **kwargs)
+        return super(ConvolutionBlock, self).call(inputs, **kwargs)
 
     def compute_output_shape(self, input_shape):
-        super(ConvolutionBlock, self).compute_output_shape(input_shape)
+        return super(ConvolutionBlock, self).compute_output_shape(input_shape)
 
 
 class BottleneckBlock(BasicLayer):
@@ -127,10 +127,10 @@ class BottleneckBlock(BasicLayer):
         )
 
     def call(self, inputs, **kwargs):
-        super(BottleneckBlock, self).call(inputs, **kwargs)
+        return super(BottleneckBlock, self).call(inputs, **kwargs)
 
     def compute_output_shape(self, input_shape):
-        super(BottleneckBlock, self).compute_output_shape(input_shape)
+        return super(BottleneckBlock, self).compute_output_shape(input_shape)
 
 
 class Group(BasicLayer):
@@ -146,10 +146,10 @@ class Group(BasicLayer):
         )
 
     def call(self, inputs, **kwargs):
-        super(Group, self).call(inputs, **kwargs)
+        return super(Group, self).call(inputs, **kwargs)
 
     def compute_output_shape(self, input_shape):
-        super(Group, self).compute_output_shape(input_shape)
+        return super(Group, self).compute_output_shape(input_shape)
 
 
 class WideResidualNetwork(Model):
