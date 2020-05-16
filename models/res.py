@@ -21,9 +21,9 @@ def get_res(
     )
     model = Sequential()
     model.add(wrn)
-    model.add(Dense(128, activation='relu'))
+    model.add(Dense(128, activation=relu))
     model.add(Dropout(0.2))
-    model.add(Dense(128, activation='relu'))
+    model.add(Dense(128, activation=relu))
     model.add(Dropout(0.2))
     model.add(Dense(number_of_classes, activation='softmax'))
     model.compile(
@@ -86,7 +86,7 @@ class ConvolutionBlock(BasicLayer):
 
 class BottleneckBlock(BasicLayer):
 
-    def __init__(self, filters, stride=1, activation=relu, k=1, **kwargs):
+    def __init__(self, filters, stride=1, activation=ReLU, k=1, **kwargs):
         super(BottleneckBlock, self).__init__(**kwargs)
         self.sub_layers = [
             ConvolutionBlock(
@@ -132,8 +132,7 @@ class WideResidualNetwork(Model):
         self.groups = [
             Conv2D(
                 filters=WideResidualNetwork.FILTER_SIZES[0],
-                kernel_size=(3, 3),
-                activation=activation
+                kernel_size=(3, 3)
             )
         ]
         self.groups.extend([
