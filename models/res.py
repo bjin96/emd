@@ -19,6 +19,7 @@ def get_res(
     wrn = WideResidualNetwork(
         group_size=13,
         activation=ReLU,
+        input_shape=(227, 227, 3)
     )
     model = Sequential()
     model.add(wrn)
@@ -152,19 +153,19 @@ class Group(BasicLayer):
         return super(Group, self).compute_output_shape(input_shape)
 
 
-class WideResidualNetwork(Model):
+class WideResidualNetwork(Layer):
 
-    FILTER_SIZES = [16, 32, 64]
-    STRIDES = [1, 2, 2]
+    FILTER_SIZES = [16, 16, 32, 64]
+    STRIDES = [4, 1, 2, 2]
 
-    def __init__(self, group_size, activation=ReLU, k=1, **kwargs):
-        super(WideResidualNetwork, self).__init__(dynamic=True, **kwargs)
+    def __init__(self, input_shape, group_size, pool_size=8, activation=ReLU, k=1, **kwargs):
+        super(WideResidualNetwork, self).__init__(input_shape=input_shape, dynamic=True, **kwargs)
         self.groups = [
             Conv2D(
+                input_shape=input_shape,
                 filters=WideResidualNetwork.FILTER_SIZES[0],
                 kernel_size=(3, 3),
-                input_shape=(227, 227, 3),
-                strides=4,
+                strides=WideResidualNetwork.STRIDES[0],
                 padding='same'
             )
         ]
@@ -176,9 +177,10 @@ class WideResidualNetwork(Model):
                 activation=activation,
                 k=k
             )
-            for i in range(len(WideResidualNetwork.FILTER_SIZES))
+            for i in range(1, len(WideResidualNetwork.FILTER_SIZES))
         ])
-        self.groups.append(AvgPool2D(pool_size=(8, 8)))
+        self.groups.append(AvgPool2D(pool_size=pool_size))
+        self.pool_size = pool_size
 
     def call(self, inputs, **kwargs):
         x = self.groups[0](inputs)
@@ -190,7 +192,7 @@ class WideResidualNetwork(Model):
         stride_product = np.product(WideResidualNetwork.STRIDES)
         return TensorShape((
             input_shape[0],
-            input_shape[1] // stride_product,
-            input_shape[2] // stride_product,
+            input_shape[1] // (stride_product * self.pool_size),
+            input_shape[2] // (stride_product * self.pool_size),
             WideResidualNetwork.FILTER_SIZES[-1]
         ))
