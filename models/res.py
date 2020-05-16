@@ -45,6 +45,9 @@ def get_res_f(
 
 class BasicLayer(Layer):
 
+    def __init__(self, **kwargs):
+        super(BasicLayer, self).__init__(**kwargs)
+
     def call(self, inputs, **kwargs):
         x = self.sub_layers[0](inputs)
         for layer in self.sub_layers[1:]:
@@ -55,6 +58,7 @@ class BasicLayer(Layer):
 class ConvolutionBlock(BasicLayer):
 
     def __init__(self, filters, kernel_size, stride=1, activation=ReLU, k=1, **kwargs):
+        super(ConvolutionBlock, self).__init__(**kwargs)
         self.sub_layers = [
             BatchNormalization(),
             activation(),
@@ -64,7 +68,6 @@ class ConvolutionBlock(BasicLayer):
                 strides=stride
             )
         ]
-        super(ConvolutionBlock, self).__init__(**kwargs)
 
     def call(self, inputs, **kwargs):
         super(ConvolutionBlock, self).call(inputs, **kwargs)
@@ -73,6 +76,7 @@ class ConvolutionBlock(BasicLayer):
 class BottleneckBlock(BasicLayer):
 
     def __init__(self, filters, stride=1, activation=relu, k=1, **kwargs):
+        super(BottleneckBlock, self).__init__(**kwargs)
         self.sub_layers = [
             ConvolutionBlock(
                 filters=filters * k,
@@ -91,7 +95,6 @@ class BottleneckBlock(BasicLayer):
                 activation=activation
             )
         ]
-        super(BottleneckBlock, self).__init__(**kwargs)
 
     def call(self, inputs, **kwargs):
         super(BottleneckBlock, self).call(inputs, **kwargs)
@@ -100,9 +103,9 @@ class BottleneckBlock(BasicLayer):
 class Group(BasicLayer):
 
     def __init__(self, n, filters, stride=1, activation=ReLU, k=1, **kwargs):
+        super(Group, self).__init__(**kwargs)
         self.sub_layers = BottleneckBlock(filters, stride, activation, k)
         self.sub_layers.extend([BottleneckBlock(filters, activation=activation, k=k) for _ in range(n - 1)])
-        super(Group, self).__init__(**kwargs)
 
     def call(self, inputs, **kwargs):
         super(Group, self).call(inputs, **kwargs)
@@ -114,6 +117,7 @@ class WideResidualNetwork(Model):
     STRIDES = [1, 2, 2]
 
     def __init__(self, group_size, activation=ReLU, k=1, **kwargs):
+        super(WideResidualNetwork, self).__init__(**kwargs)
         self.groups = [
             Conv2D(
                 filters=WideResidualNetwork.FILTER_SIZES[0],
@@ -131,7 +135,6 @@ class WideResidualNetwork(Model):
             )
             for i in range(len(WideResidualNetwork.FILTER_SIZES))
         ])
-        super(WideResidualNetwork, self).__init__(**kwargs)
 
     def call(self, inputs, **kwargs):
         x = self.groups[0](inputs)
