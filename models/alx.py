@@ -1,11 +1,10 @@
 from typing import Callable
 
-import tensorflow.keras.backend as K
-
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Conv2D, MaxPool2D, Flatten, Dense, Dropout, Layer
 from tensorflow.keras.activations import relu, softmax
 from tensorflow.keras.optimizers import SGD
+from tensorflow.python.ops.nn_ops import local_response_normalization
 
 from models.constants import OPTIMIZER_MOMENTUM
 
@@ -88,19 +87,13 @@ class LocalResponseNormalization(Layer):
         super(LocalResponseNormalization, self).__init__(**kwargs)
 
     def call(self, inputs, **kwargs):
-        _, f, r, c = inputs.shape
-        squared = K.square(inputs)
-        pooled = K.pool2d(
-            squared,
-            (self.n, self.n),
-            strides=(1, 1),
-            padding="same",
-            pool_mode="avg"
+        return local_response_normalization(
+            input=inputs,
+            depth_radius=self.n,
+            bias=self.k,
+            alpha=self.alpha,
+            beta=self.beta
         )
-        summed = K.sum(pooled, axis=1, keepdims=True)
-        averaged = self.alpha * K.repeat_elements(summed, f, axis=1)
-        denominator = K.pow(self.k + averaged, self.beta)
-        return inputs / denominator
 
     def compute_output_shape(self, input_shape):
         return input_shape
