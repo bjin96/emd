@@ -4,7 +4,7 @@ import numpy as np
 
 from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.activations import relu
-from tensorflow.keras.layers import Conv2D, Layer, BatchNormalization, Dropout, Dense, ReLU, Flatten
+from tensorflow.keras.layers import Conv2D, Layer, BatchNormalization, Dropout, Dense, ReLU, Flatten, AvgPool2D
 from tensorflow.keras.models import Model, Sequential
 from tensorflow import TensorShape
 
@@ -178,6 +178,7 @@ class WideResidualNetwork(Model):
             )
             for i in range(len(WideResidualNetwork.FILTER_SIZES))
         ])
+        self.groups.append(AvgPool2D)
 
     def call(self, inputs, **kwargs):
         x = self.groups[0](inputs)
