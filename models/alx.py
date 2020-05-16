@@ -1,7 +1,8 @@
 from typing import Callable
 
+from tensorflow.keras import Input
 from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import Conv2D, MaxPool2D, Flatten, Dense, Dropout, Layer
+from tensorflow.keras.layers import Conv2D, MaxPool2D, Flatten, Dense, Dropout, Layer,Concatenate
 from tensorflow.keras.activations import relu, softmax
 from tensorflow.keras.optimizers import SGD
 from tensorflow.python.ops.nn_ops import local_response_normalization
@@ -66,6 +67,153 @@ def get_alxs(
         units=number_of_classes,
         activation=softmax
     ))
+    model.compile(
+        loss=loss_function,
+        optimizer=SGD(
+            learning_rate=learning_rate,
+            momentum=OPTIMIZER_MOMENTUM
+        ),
+        metrics=['acc']
+    )
+    return model
+
+
+def get_alx(
+        loss_function: Callable,
+        learning_rate: float,
+        number_of_classes: int
+) -> Model:
+    inputs = Input(
+        shape=(227, 227, 3)
+    )
+    convolution_1a = Conv2D(
+        filters=48,
+        kernel_size=(11, 11),
+        padding='same',
+        strides=4,
+        activation=relu
+    )(inputs)
+    convolution_1b = Conv2D(
+        filters=48,
+        kernel_size=(11, 11),
+        padding='same',
+        strides=4,
+        activation=relu
+    )(inputs)
+    normalized_1a = LocalResponseNormalization()(convolution_1a)
+    normalized_1b = LocalResponseNormalization()(convolution_1b)
+    max_pooling_1a = MaxPool2D(
+        pool_size=(3, 3),
+        strides=2,
+        padding='same',
+    )(normalized_1a)
+    max_pooling_1b = MaxPool2D(
+        pool_size=(3, 3),
+        strides=2,
+        padding='same',
+    )(normalized_1b)
+    convolution_2a = Conv2D(
+        filters=128,
+        kernel_size=(5, 5),
+        padding='same',
+        activation=relu
+    )(max_pooling_1a)
+    convolution_2b = Conv2D(
+        filters=128,
+        kernel_size=(5, 5),
+        padding='same',
+        activation=relu
+    )(max_pooling_1b)
+    normalized_2a = LocalResponseNormalization()(convolution_2a)
+    normalized_2b = LocalResponseNormalization()(convolution_2b)
+    max_pooling_2a = MaxPool2D(
+        pool_size=(3, 3),
+        strides=2,
+        padding='same',
+    )(normalized_2a)
+    max_pooling_2b = MaxPool2D(
+        pool_size=(3, 3),
+        strides=2,
+        padding='same',
+    )(normalized_2b)
+    concatenated_1 = Concatenate()([max_pooling_2a, max_pooling_2b])
+    convolution_3a = Conv2D(
+        filters=192,
+        kernel_size=(3, 3),
+        padding='same',
+        activation=relu
+    )(concatenated_1)
+    convolution_3b = Conv2D(
+        filters=192,
+        kernel_size=(3, 3),
+        padding='same',
+        activation=relu
+    )(concatenated_1)
+    convolution_4a = Conv2D(
+        filters=192,
+        kernel_size=(3, 3),
+        padding='same',
+        activation=relu
+    )(convolution_3a)
+    convolution_4b = Conv2D(
+        filters=192,
+        kernel_size=(3, 3),
+        padding='same',
+        activation=relu
+    )(convolution_3b)
+    convolution_5a = Conv2D(
+        filters=192,
+        kernel_size=(3, 3),
+        padding='same',
+        activation=relu
+    )(convolution_4a)
+    convolution_5b = Conv2D(
+        filters=192,
+        kernel_size=(3, 3),
+        padding='same',
+        activation=relu
+    )(convolution_4b)
+    max_pooling_2a = MaxPool2D(
+        pool_size=(3, 3),
+        strides=2,
+        padding='same',
+    )(convolution_5a)
+    max_pooling_2b = MaxPool2D(
+        pool_size=(3, 3),
+        strides=2,
+        padding='same',
+    )(convolution_5b)
+    concatenated_2 = Concatenate()(max_pooling_2a, max_pooling_2b)
+    flattened_1 = Flatten()(concatenated_2)
+    dense_1a = Dense(
+        units=2048,
+        activation=relu
+    )(flattened_1)
+    dense_1b = Dense(
+        units=2048,
+        activation=relu
+    )(flattened_1)
+    dropped_1a = Dropout(rate=0.5)(dense_1a)
+    dropped_1b = Dropout(rate=0.5)(dense_1b)
+    dense_2a = Dense(
+        units=2048,
+        activation=relu
+    )(dropped_1a)
+    dense_2b = Dense(
+        units=2048,
+        activation=relu
+    )(dropped_1b)
+    dropped_2a = Dropout(rate=0.5)(dense_2a)
+    dropped_2b = Dropout(rate=0.5)(dense_2b)
+    concatenated_3 = Concatenate()([dropped_2a, dropped_2b])
+    outputs = Dense(
+        units=number_of_classes,
+        activation=softmax
+    )(concatenated_3)
+    model = Model(
+        inputs=inputs,
+        outputs=outputs
+    )
     model.compile(
         loss=loss_function,
         optimizer=SGD(
