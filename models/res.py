@@ -22,6 +22,7 @@ def get_res(
     )
     model = Sequential()
     model.add(wrn)
+    model.add(Flatten())
     model.add(Dense(128, activation=relu))
     model.add(Dropout(0.2))
     model.add(Dense(128, activation=relu))
@@ -161,7 +162,10 @@ class WideResidualNetwork(Model):
         self.groups = [
             Conv2D(
                 filters=WideResidualNetwork.FILTER_SIZES[0],
-                kernel_size=(3, 3)
+                kernel_size=(3, 3),
+                input_shape=(227, 227, 3),
+                strides=4,
+                padding='same'
             )
         ]
         self.groups.extend([
