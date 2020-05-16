@@ -1,5 +1,7 @@
 from typing import Callable
 
+import tensorflow.keras.backend as K
+
 from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.activations import relu
 from tensorflow.keras.layers import Conv2D, Layer, ReLU, BatchNormalization, Dropout, Dense
@@ -81,7 +83,7 @@ class BottleneckBlock(BasicLayer):
             ConvolutionBlock(
                 filters=filters * k,
                 kernel_size=(1, 1),
-                strides=stride,
+                stride=stride,
                 activation=activation
             ),
             ConvolutionBlock(
@@ -129,7 +131,7 @@ class WideResidualNetwork(Model):
             Group(
                 n=group_size,
                 filters=WideResidualNetwork.FILTER_SIZES[i],
-                strides=WideResidualNetwork.STRIDES,
+                stride=WideResidualNetwork.STRIDES[i],
                 activation=activation,
                 k=k
             )
