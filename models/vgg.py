@@ -1,5 +1,6 @@
-from typing import Callable
+from typing import Callable, Union
 
+from tensorflow.keras.activations import softmax, linear, relu
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Dense, Dropout
 from tensorflow.keras.optimizers import SGD
@@ -11,7 +12,8 @@ from models.constants import OPTIMIZER_MOMENTUM
 def get_vgg_f(
         loss_function: Callable,
         learning_rate: float,
-        number_of_classes: int
+        number_of_classes: int,
+        final_activation: Union[softmax, linear]
 ) -> Model:
     vgg = VGG16(
         include_top=False,
@@ -20,11 +22,11 @@ def get_vgg_f(
     )
     model = Sequential()
     model.add(vgg)
-    model.add(Dense(128, activation='relu'))
+    model.add(Dense(128, activation=relu))
     model.add(Dropout(0.2))
-    model.add(Dense(128, activation='relu'))
+    model.add(Dense(128, activation=relu))
     model.add(Dropout(0.2))
-    model.add(Dense(number_of_classes, activation='softmax'))
+    model.add(Dense(number_of_classes, activation=final_activation))
     model.compile(
         loss=loss_function,
         optimizer=SGD(

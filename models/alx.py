@@ -1,9 +1,9 @@
-from typing import Callable
+from typing import Callable, Union
 
 from tensorflow.keras import Input
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Conv2D, MaxPool2D, Flatten, Dense, Dropout, Layer,Concatenate
-from tensorflow.keras.activations import relu, softmax
+from tensorflow.keras.activations import relu, softmax, linear
 from tensorflow.keras.optimizers import SGD
 from tensorflow.python.ops.nn_ops import local_response_normalization
 
@@ -13,7 +13,8 @@ from models.constants import OPTIMIZER_MOMENTUM
 def get_alxs(
         loss_function: Callable,
         learning_rate: float,
-        number_of_classes: int
+        number_of_classes: int,
+        final_activation: Union[softmax, linear]
 ) -> Model:
     model = Sequential()
     model.add(Conv2D(
@@ -65,7 +66,7 @@ def get_alxs(
     model.add(Dropout(0.5))
     model.add(Dense(
         units=number_of_classes,
-        activation=softmax
+        activation=final_activation
     ))
     model.compile(
         loss=loss_function,

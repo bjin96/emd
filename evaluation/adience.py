@@ -1,6 +1,7 @@
 from pathlib import Path
-from typing import List, Callable
+from typing import List, Callable, Union
 
+from tensorflow.keras.activations import linear, softmax
 from tensorflow.keras.models import Model
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.callbacks import ModelCheckpoint
@@ -18,13 +19,15 @@ from models.vgg import get_vgg_f
 
 
 def evaluate_adience_vgg_f(
-        loss_function: Callable
+        loss_function: Callable,
+        final_activation: Union[softmax, linear]
 ) -> None:
     for learning_rate in LEARNING_RATES:
         model = get_vgg_f(
             loss_function=loss_function,
             learning_rate=learning_rate,
-            number_of_classes=len(ADIENCE_CLASSES)
+            number_of_classes=len(ADIENCE_CLASSES),
+            final_activation=final_activation
         )
         evaluate_adience_folds(
             model=model,
@@ -40,13 +43,15 @@ def evaluate_adience_vgg_f(
 
 
 def evaluate_adience_alxs(
-        loss_function: Callable
+        loss_function: Callable,
+        final_activation: Union[softmax, linear]
 ) -> None:
     for learning_rate in LEARNING_RATES:
         model = get_alxs(
             loss_function=loss_function,
             learning_rate=learning_rate,
-            number_of_classes=len(ADIENCE_CLASSES)
+            number_of_classes=len(ADIENCE_CLASSES),
+            final_activation=final_activation
         )
         evaluate_adience_folds(
             model=model,
@@ -62,13 +67,15 @@ def evaluate_adience_alxs(
 
 
 def evaluate_adience_res(
-        loss_function: Callable
+        loss_function: Callable,
+        final_activation: Union[softmax, linear]
 ) -> None:
     for learning_rate in LEARNING_RATES:
         model = get_res(
             loss_function=loss_function,
             learning_rate=learning_rate,
-            number_of_classes=len(ADIENCE_CLASSES)
+            number_of_classes=len(ADIENCE_CLASSES),
+            final_activation=final_activation
         )
         evaluate_adience_folds(
             model=model,

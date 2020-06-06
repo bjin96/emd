@@ -1,9 +1,9 @@
-from typing import Callable
+from typing import Callable, Union
 
 import numpy as np
 
 from tensorflow.keras.optimizers import SGD
-from tensorflow.keras.activations import relu
+from tensorflow.keras.activations import relu, softmax, linear
 from tensorflow.keras.layers import Conv2D, Layer, BatchNormalization, Dropout, Dense, ReLU, Flatten, AvgPool2D
 from tensorflow.keras.models import Model, Sequential
 from tensorflow import TensorShape
@@ -14,7 +14,8 @@ from models.constants import OPTIMIZER_MOMENTUM
 def get_res(
         loss_function: Callable,
         learning_rate: float,
-        number_of_classes: int
+        number_of_classes: int,
+        final_activation: Union[softmax, linear]
 ) -> Model:
     wrn = WideResidualNetwork(
         group_size=13,
@@ -28,7 +29,7 @@ def get_res(
     model.add(Dropout(0.2))
     model.add(Dense(128, activation=relu))
     model.add(Dropout(0.2))
-    model.add(Dense(number_of_classes, activation='softmax'))
+    model.add(Dense(number_of_classes, activation=final_activation))
     model.compile(
         loss=loss_function,
         optimizer=SGD(
