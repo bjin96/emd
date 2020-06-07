@@ -1,5 +1,6 @@
 from typing import Callable, Union
 
+from tensorflow.keras.metrics import TopKCategoricalAccuracy, Accuracy
 from tensorflow.keras.activations import softmax, linear, relu
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Dense, Dropout
@@ -33,6 +34,6 @@ def get_vgg_f(
             momentum=OPTIMIZER_MOMENTUM,
             learning_rate=learning_rate
         ),
-        metrics=['acc']
+        metrics=[Accuracy(), TopKCategoricalAccuracy(k=3)]
     )
     return model

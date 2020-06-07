@@ -5,6 +5,7 @@ from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Conv2D, MaxPool2D, Flatten, Dense, Dropout, Layer,Concatenate
 from tensorflow.keras.activations import relu, softmax, linear
 from tensorflow.keras.optimizers import SGD
+from tensorflow.keras.metrics import Accuracy, TopKCategoricalAccuracy
 from tensorflow.python.ops.nn_ops import local_response_normalization
 
 from models.constants import OPTIMIZER_MOMENTUM
@@ -74,7 +75,7 @@ def get_alxs(
             learning_rate=learning_rate,
             momentum=OPTIMIZER_MOMENTUM
         ),
-        metrics=['acc']
+        metrics=[Accuracy(), TopKCategoricalAccuracy(k=3)]
     )
     return model
 
@@ -221,7 +222,7 @@ def get_alx(
             learning_rate=learning_rate,
             momentum=OPTIMIZER_MOMENTUM
         ),
-        metrics=['acc']
+        metrics=[Accuracy(), TopKCategoricalAccuracy(k=3)]
     )
     return model
 

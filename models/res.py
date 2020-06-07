@@ -6,6 +6,7 @@ from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.activations import relu, softmax, linear
 from tensorflow.keras.layers import Conv2D, Layer, BatchNormalization, Dropout, Dense, ReLU, Flatten, AvgPool2D
 from tensorflow.keras.models import Model, Sequential
+from tensorflow.keras.metrics import Accuracy, TopKCategoricalAccuracy
 from tensorflow import TensorShape
 
 from models.constants import OPTIMIZER_MOMENTUM
@@ -36,7 +37,7 @@ def get_res(
             momentum=OPTIMIZER_MOMENTUM,
             learning_rate=learning_rate
         ),
-        metrics=['acc']
+        metrics=[Accuracy(), TopKCategoricalAccuracy(k=3)]
     )
     return model
 
