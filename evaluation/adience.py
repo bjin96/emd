@@ -1,8 +1,7 @@
 from pathlib import Path
-from typing import List, Callable, Union
+from typing import List, Callable, Union, Type
 
 from tensorflow.keras.activations import linear, softmax
-from tensorflow.keras.models import Model
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.callbacks import TensorBoard
@@ -12,70 +11,23 @@ from data_handlers.adience import get_adience_info, ADIENCE_TRAIN_FOLDS_INFO_FIL
 from data_handlers.data_set_info import DatasetName
 from data_handlers.generators import get_generators
 from evaluation.logging import get_checkpoint_file, get_tensorboard_callback
-from models.alx import get_alxs
 from models.constants import LEARNING_RATES
-from models.res import get_res
-from models.vgg import get_vgg_f
+from models.evaluation_model import EvaluationModel
 
 
-def evaluate_adience_vgg_f(
+def evaluate_adience_model(
+        evaluation_model: Type[EvaluationModel],
         loss_function: Callable,
-        final_activation: Union[softmax, linear]
-) -> None:
+        final_activation: Union[softmax, linear],
+        **loss_function_kwargs
+):
     for learning_rate in LEARNING_RATES:
-        model = get_vgg_f(
+        model = evaluation_model(
+            number_of_classes=len(ADIENCE_CLASSES),
+            final_activation=final_activation,
             loss_function=loss_function,
             learning_rate=learning_rate,
-            number_of_classes=len(ADIENCE_CLASSES),
-            final_activation=final_activation
-        )
-        evaluate_adience_folds(
-            model=model,
-            checkpoint_callback=get_checkpoint_file(
-                data_set_name=DatasetName.ADIENCE,
-                learning_rate=learning_rate
-            ),
-            tensorboard_callback=get_tensorboard_callback(
-                data_set_name=DatasetName.ADIENCE,
-                learning_rate=learning_rate
-            )
-        )
-
-
-def evaluate_adience_alxs(
-        loss_function: Callable,
-        final_activation: Union[softmax, linear]
-) -> None:
-    for learning_rate in LEARNING_RATES:
-        model = get_alxs(
-            loss_function=loss_function,
-            learning_rate=learning_rate,
-            number_of_classes=len(ADIENCE_CLASSES),
-            final_activation=final_activation
-        )
-        evaluate_adience_folds(
-            model=model,
-            checkpoint_callback=get_checkpoint_file(
-                data_set_name=DatasetName.ADIENCE,
-                learning_rate=learning_rate
-            ),
-            tensorboard_callback=get_tensorboard_callback(
-                data_set_name=DatasetName.ADIENCE,
-                learning_rate=learning_rate
-            )
-        )
-
-
-def evaluate_adience_res(
-        loss_function: Callable,
-        final_activation: Union[softmax, linear]
-) -> None:
-    for learning_rate in LEARNING_RATES:
-        model = get_res(
-            loss_function=loss_function,
-            learning_rate=learning_rate,
-            number_of_classes=len(ADIENCE_CLASSES),
-            final_activation=final_activation
+            **loss_function_kwargs
         )
         evaluate_adience_folds(
             model=model,
@@ -91,7 +43,7 @@ def evaluate_adience_res(
 
 
 def evaluate_adience_folds(
-        model: Model,
+        model: EvaluationModel,
         checkpoint_callback: ModelCheckpoint,
         tensorboard_callback: TensorBoard
 ) -> None:
@@ -105,7 +57,7 @@ def evaluate_adience_folds(
 
 
 def evaluate_adience_fold(
-        model: Model,
+        model: EvaluationModel,
         train_fold_info_files: List[Path],
         validation_fold_info_file: Path,
         checkpoint_callback: ModelCheckpoint,
@@ -129,15 +81,15 @@ def evaluate_adience_fold(
 
 
 def evaluate(
-        model: Model,
+        model: EvaluationModel,
         train_generator: ImageDataGenerator,
         validation_generator: ImageDataGenerator,
         checkpoint_callback: ModelCheckpoint,
         tensorboard_callback: TensorBoard
 ) -> None:
     model.fit(
-        train_generator,
-        epochs=1,
+        x=train_generator,
+        epochs=50,
         validation_data=validation_generator,
         callbacks=[checkpoint_callback, tensorboard_callback]
     )

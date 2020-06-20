@@ -1,12 +1,11 @@
 from typing import Callable
 
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
 
-from tensorflow.keras.losses import categorical_crossentropy
 from tensorflow.keras import backend as K
-
-from models.vgg import EmdWeightHeadStart
+from tensorflow.keras.callbacks import Callback
+from tensorflow.keras.losses import categorical_crossentropy
 
 
 def earth_mover_distance(
@@ -24,8 +23,19 @@ def earth_mover_distance(
     return _earth_mover_distance
 
 
+class EmdWeightHeadStart(Callback):
+
+    def __init__(self):
+        super(EmdWeightHeadStart, self).__init__()
+        self.emd_weight = False
+
+    def on_epoch_begin(self, epoch, logs={}):
+        if epoch == 5:
+            self.emd_weight = True
+
+
 def self_guided_earth_mover_distance(
-        second_to_last: K.placeholder,
+        second_to_last_layer: K.placeholder,
         emd_weight_head_start: EmdWeightHeadStart,
         ground_distance_sensitivity: float,
         ground_distance_bias: float
@@ -35,7 +45,7 @@ def self_guided_earth_mover_distance(
             y_true: K.placeholder,
             y_pred: K.placeholder
     ) -> K.placeholder:
-        class_features = second_to_last
+        class_features = second_to_last_layer
         cross_entropy_loss = categorical_crossentropy(
             y_true=y_true,
             y_pred=y_pred
