@@ -30,7 +30,7 @@ def get_checkpoint_file(
     data_set_checkpoint_dir.mkdir(parents=True, exist_ok=True)
     return ModelCheckpoint(
         filepath=str(data_set_checkpoint_dir / Path(current_datetime)),
-        monitor='val_acc',
+        monitor='val_categorical_accuracy',
         verbose=1,
         save_best_only=True,
         mode='max'
