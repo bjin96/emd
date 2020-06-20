@@ -1,11 +1,12 @@
 from tensorflow.keras.activations import softmax
 from tensorflow.keras.activations import linear
-from tensorflow.keras.losses import categorical_crossentropy, mean_squared_error
 
 from evaluation.adience import evaluate_adience_model
 import tensorflow as tf
 
+from loss_functions.crossentropy import cross_entropy
 from loss_functions.emd import earth_mover_distance, self_guided_earth_mover_distance
+from loss_functions.regression import l2_regression_loss
 from models.alx import Alxs
 from models.res import Resf
 from models.vgg import Vggf
@@ -23,9 +24,9 @@ if devices:
 
 def main():
     # Evaluate with cross-entropy loss:
-    evaluate_adience_model(Vggf, categorical_crossentropy, softmax)
-    evaluate_adience_model(Resf, categorical_crossentropy, softmax)
-    evaluate_adience_model(Alxs, categorical_crossentropy, softmax)
+    evaluate_adience_model(Vggf, cross_entropy, softmax)
+    evaluate_adience_model(Resf, cross_entropy, softmax)
+    evaluate_adience_model(Alxs, cross_entropy, softmax)
 
     # Evaluate with EMD^2 loss:
     evaluate_adience_model(Vggf, earth_mover_distance, softmax)
@@ -56,9 +57,9 @@ def main():
     )
 
     # Evaluate with L2 regression loss:
-    evaluate_adience_model(Vggf, mean_squared_error, linear)
-    evaluate_adience_model(Resf, mean_squared_error, linear)
-    evaluate_adience_model(Alxs, mean_squared_error, linear)
+    evaluate_adience_model(Vggf, l2_regression_loss, linear)
+    evaluate_adience_model(Resf, l2_regression_loss, linear)
+    evaluate_adience_model(Alxs, l2_regression_loss, linear)
 
 
 if __name__ == "__main__":
