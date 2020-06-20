@@ -18,28 +18,21 @@ def evaluate_adience_model(
         final_activation: Union[softmax, linear],
         **loss_function_kwargs
 ):
-    for learning_rate in LEARNING_RATES:
-        model = evaluation_model(
-            number_of_classes=len(ADIENCE_CLASSES),
-            dataset_name=DatasetName.ADIENCE,
-            final_activation=final_activation,
-            loss_function=loss_function,
-            learning_rate=learning_rate,
-            **loss_function_kwargs
-        )
-        evaluate_adience_folds(
-            model=model
-        )
-
-
-def evaluate_adience_folds(
-        model: EvaluationModel
-) -> None:
-    evaluate_adience_fold(
-        model=model,
-        train_fold_info_files=ADIENCE_TRAIN_FOLDS_INFO_FILES[0],
-        validation_fold_info_file=ADIENCE_VALIDATION_FOLDS_INFO_FILES[0]
-    )
+    for i, _ in enumerate(ADIENCE_TRAIN_FOLDS_INFO_FILES):
+        for learning_rate in LEARNING_RATES:
+            model = evaluation_model(
+                number_of_classes=len(ADIENCE_CLASSES),
+                dataset_name=DatasetName.ADIENCE,
+                final_activation=final_activation,
+                loss_function=loss_function,
+                learning_rate=learning_rate,
+                **loss_function_kwargs
+            )
+            evaluate_adience_fold(
+                model=model,
+                train_fold_info_files=ADIENCE_TRAIN_FOLDS_INFO_FILES[i],
+                validation_fold_info_file=ADIENCE_VALIDATION_FOLDS_INFO_FILES[i]
+            )
 
 
 def evaluate_adience_fold(
