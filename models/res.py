@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, ClassVar
 
 import numpy as np
 
@@ -11,6 +11,8 @@ from models.evaluation_model import EvaluationModel
 
 
 class Res(EvaluationModel):
+
+    _MODEL_NAME: ClassVar[str] = 'RES'
 
     def _build_model(
             self,
@@ -33,6 +35,8 @@ class Res(EvaluationModel):
 
 
 class Resf(EvaluationModel):
+
+    _MODEL_NAME: ClassVar[str] = 'RES_f'
 
     def _build_model(
             self,

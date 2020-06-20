@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, ClassVar
 
 from tensorflow.keras import Sequential
 from tensorflow.keras.activations import softmax, linear, relu
@@ -9,6 +9,8 @@ from models.evaluation_model import EvaluationModel
 
 
 class Vggf(EvaluationModel):
+
+    _MODEL_NAME: ClassVar[str] = 'VGG_f'
 
     def _build_model(
             self,

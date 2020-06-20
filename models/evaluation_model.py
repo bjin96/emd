@@ -21,6 +21,7 @@ class EvaluationModel(ABC):
         categorical_accuracy,
         one_off_accuracy
     ]
+    _MODEL_NAME: ClassVar[str] = 'base_model'
     model: Model = None
 
     def __init__(
@@ -84,11 +85,13 @@ class EvaluationModel(ABC):
                 self.emd_weight_head_start,
                 get_checkpoint_file(
                     data_set_name=self.dataset_name,
-                    learning_rate=self.learning_rate
+                    learning_rate=self.learning_rate,
+                    model_name=self._MODEL_NAME
                 ),
                 get_tensorboard_callback(
                     data_set_name=self.dataset_name,
-                    learning_rate=self.learning_rate
+                    learning_rate=self.learning_rate,
+                    model_name=self._MODEL_NAME
                 )
             ],
             **kwargs

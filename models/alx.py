@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, ClassVar
 
 from tensorflow.keras import Input
 from tensorflow.keras.models import Sequential, Model
@@ -10,6 +10,8 @@ from models.evaluation_model import EvaluationModel
 
 
 class Alxs(EvaluationModel):
+
+    _MODEL_NAME: ClassVar[str] = 'ALXs'
 
     def _build_model(
             self,
@@ -71,6 +73,8 @@ class Alxs(EvaluationModel):
 
 
 class Alx(EvaluationModel):
+
+    _MODEL_NAME: ClassVar[str] = 'ALX'
 
     def _build_model(
             self,

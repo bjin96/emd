@@ -11,10 +11,11 @@ CHECKPOINT_DIR = Path('./checkpoints')
 
 def get_tensorboard_callback(
         data_set_name: DatasetName,
-        learning_rate: float
+        learning_rate: float,
+        model_name: str
 ) -> TensorBoard:
     current_datetime = datetime.now().strftime("%Y%m%d-%H%M%S")
-    data_set_log_dir = LOG_DIR / Path(data_set_name.value) / Path(str(learning_rate)) / Path(current_datetime)
+    data_set_log_dir = LOG_DIR / Path(data_set_name.value) / Path(model_name) / Path(str(learning_rate)) / Path(current_datetime)
     data_set_log_dir.mkdir(parents=True, exist_ok=True)
     return TensorBoard(
         log_dir=data_set_log_dir
@@ -23,10 +24,11 @@ def get_tensorboard_callback(
 
 def get_checkpoint_file(
         data_set_name: DatasetName,
-        learning_rate: float
+        learning_rate: float,
+        model_name: str
 ) -> ModelCheckpoint:
     current_datetime = datetime.now().strftime("%Y%m%d-%H%M%S")
-    data_set_checkpoint_dir = CHECKPOINT_DIR / Path(data_set_name.value) / Path(str(learning_rate))
+    data_set_checkpoint_dir = CHECKPOINT_DIR / Path(data_set_name.value) / Path(model_name) / Path(str(learning_rate))
     data_set_checkpoint_dir.mkdir(parents=True, exist_ok=True)
     return ModelCheckpoint(
         filepath=str(data_set_checkpoint_dir / Path(current_datetime)),
