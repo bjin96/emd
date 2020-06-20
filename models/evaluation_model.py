@@ -4,10 +4,11 @@ from typing import ClassVar, Callable, Union, List
 from tensorflow.keras.metrics import Metric
 from tensorflow.keras import Model
 from tensorflow.keras.activations import linear, softmax
-from tensorflow.keras.metrics import CategoricalAccuracy, TopKCategoricalAccuracy
+from tensorflow.keras.metrics import categorical_accuracy
 from tensorflow.keras.optimizers import SGD, Optimizer
 
 from loss_functions.emd import EmdWeightHeadStart
+from metrics.accuracy import one_off_accuracy
 
 
 class EvaluationModel(ABC):
@@ -15,11 +16,8 @@ class EvaluationModel(ABC):
     _OPTIMIZER: ClassVar[Optimizer] = SGD
     _OPTIMIZER_MOMENTUM: ClassVar[float] = 0.98
     _METRICS: ClassVar[List[Metric]] = [
-        CategoricalAccuracy(),
-        TopKCategoricalAccuracy(
-            k=3,
-            name='one-off accuracy'
-        )
+        categorical_accuracy,
+        one_off_accuracy
     ]
     model: Model = None
 
