@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Callable
 
 import numpy as np
@@ -6,6 +7,8 @@ import tensorflow as tf
 from tensorflow.keras import backend as K
 from tensorflow.keras.callbacks import Callback
 from tensorflow.keras.losses import categorical_crossentropy
+
+GROUND_DISTANCE_FILE = Path('./ground_distance')
 
 
 def earth_mover_distance(
@@ -21,6 +24,30 @@ def earth_mover_distance(
         return K.sum(K.square(K.cumsum(y_true, axis=-1) - K.cumsum(y_pred, axis=-1)), axis=-1)
 
     return _earth_mover_distance
+
+
+def approximate_earth_mover_distance(
+        entropic_regularizer: float,
+        distance_matrix: np.array,
+        matrix_scaling_operations: int = 100
+) -> Callable:
+    """
+    Wrapper for approximate earth mover distance.
+    """
+
+    def _approximate_earth_mover_distance(
+            y_true: K.placeholder,
+            y_pred: K.placeholder
+    ) -> K.placeholder:
+        k = tf.exp(-entropic_regularizer * distance_matrix)
+        km = k * distance_matrix
+        u = tf.ones(y_true.shape) / y_true.shape[1]
+        for _ in range(matrix_scaling_operations):
+            u = y_pred / (tf.exp(u @ k) @ k)
+        v = tf.exp(u * k)
+        return tf.reduce_sum(u * (v * km)) / y_true.shape[0]
+
+    return _approximate_earth_mover_distance
 
 
 class EmdWeightHeadStart(Callback):
@@ -84,6 +111,7 @@ def _calculate_self_guided_loss(
         estimated_distances=estimated_distances,
         class_length=class_length
     )
+    save_ground_distance_matrix(ground_distances)
     cost_vectors = []
     for i in range(batch_size):
         cost_vectors.append(
@@ -128,3 +156,16 @@ def _calculate_ground_distances(
     elements_smaller = tf.convert_to_tensor(elements_smaller, dtype=tf.float32)
     normalized_distances = (1 / class_length) * elements_smaller
     return (normalized_distances + K.transpose(normalized_distances)) / 2
+
+
+def save_ground_distance_matrix(
+        ground_distance_matrix: K.placeholder
+) -> None:
+    np.save(
+        file=GROUND_DISTANCE_FILE,
+        arr=ground_distance_matrix
+    )
+
+
+def load_ground_distance_matrix() -> np.array:
+    return np.load(GROUND_DISTANCE_FILE)
