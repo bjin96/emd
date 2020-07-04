@@ -18,58 +18,57 @@ class Alxs(EvaluationModel):
             number_of_classes: int,
             final_activation: Union[softmax, linear]
     ):
-        self.model = Sequential()
-        self.model.add(Conv2D(
+        self.conv1 = Conv2D(
             input_shape=(227, 227, 3),
             filters=96,
             kernel_size=(7, 7),
             strides=4,
             activation=relu
-        ))
-        self.model.add(MaxPool2D(
+        )
+        self.pool1 = MaxPool2D(
             pool_size=(3, 3),
             padding='same',
             strides=2
-        ))
-        self.model.add(LocalResponseNormalization())
-        self.model.add(Conv2D(
+        )
+        self.normalization1 = LocalResponseNormalization()
+        self.conv2 = Conv2D(
             filters=256,
             kernel_size=(5, 5),
             padding='same',
             activation=relu
-        ))
-        self.model.add(MaxPool2D(
+        )
+        self.pool2 = MaxPool2D(
             pool_size=(3, 3),
             padding='same',
             strides=2
-        ))
-        self.model.add(LocalResponseNormalization())
-        self.model.add(Conv2D(
+        )
+        self.normalization2 = LocalResponseNormalization()
+        self.conv3 = Conv2D(
             filters=384,
             kernel_size=(3, 3),
             padding='same',
             activation=relu
-        ))
-        self.model.add(MaxPool2D(
+        )
+        self.pool3 = MaxPool2D(
             pool_size=(3, 3),
             padding='same',
             strides=2
-        ))
-        self.model.add(Flatten())
-        self.model.add(Dense(
+        )
+        self.flatten = Flatten()
+        self.dense1 = Dense(
             units=512,
             activation=relu
-        ))
-        self.model.add(Dropout(0.5))
-        self.model.add(Dense(
+        )
+        self.dropout1 = Dropout(0.5)
+        self.dense2 = Dense(
             units=512,
             activation=relu
-        ))
-        self.model.add(Dropout(0.5))
-        self.model.add(Dense(
+        )
+        self.dropout2 = Dropout(0.5)
+        self.dense3 = Dense(
             units=number_of_classes,
             activation=final_activation
-        ))
+        )
 
 
 class Alx(EvaluationModel):
@@ -208,7 +207,7 @@ class Alx(EvaluationModel):
             units=number_of_classes,
             activation=softmax
         )(concatenated_3)
-        self.model = Model(
+        self.alxs = Model(
             inputs=inputs,
             outputs=outputs
         )

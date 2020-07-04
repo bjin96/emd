@@ -6,6 +6,7 @@ from tensorflow.keras import Model
 from tensorflow.keras.activations import linear, softmax
 from tensorflow.keras.metrics import categorical_accuracy
 from tensorflow.keras.optimizers import SGD, Optimizer
+from tensorflow import TensorShape
 
 from data_handlers.data_set_info import DatasetName
 from evaluation.logging import get_checkpoint_file, get_tensorboard_callback
@@ -13,7 +14,7 @@ from loss_functions.emd import EmdWeightHeadStart
 from metrics.accuracy import one_off_accuracy
 
 
-class EvaluationModel(ABC):
+class EvaluationModel(ABC, Model):
 
     _OPTIMIZER: ClassVar[Optimizer] = SGD
     _OPTIMIZER_MOMENTUM: ClassVar[float] = 0.98
@@ -33,8 +34,11 @@ class EvaluationModel(ABC):
             learning_rate: float,
             **loss_function_kwargs,
     ):
+        super(EvaluationModel, self).__init__()
+        self.number_of_classes = number_of_classes
         self.learning_rate = learning_rate
         self.dataset_name = dataset_name
+        self.second_to_last_layer = None
 
         self._build_model(
             number_of_classes=number_of_classes,
@@ -45,6 +49,12 @@ class EvaluationModel(ABC):
             **loss_function_kwargs
         )
 
+    def compute_output_shape(self, input_shape):
+        return TensorShape((
+            input_shape[0],
+            self.number_of_classes
+        ))
+
     @abstractmethod
     def _build_model(
             self,
@@ -53,8 +63,12 @@ class EvaluationModel(ABC):
     ):
         pass
 
-    def _get_second_to_last_layer(self):
-        return self.model.layers[-2]
+    def call(self, inputs, **kwargs):
+        y = inputs
+        for layer in self.layers[:-2]:
+            y = layer(y, **kwargs)
+        self.second_to_last_layer = self.layers[-2](y, **kwargs)
+        return self.layers[-1](self.second_to_last_layer, **kwargs)
 
     def _compile_model(
             self,
@@ -62,10 +76,9 @@ class EvaluationModel(ABC):
             **loss_function_kwargs
     ):
         self.emd_weight_head_start = EmdWeightHeadStart()
-        self.model.compile(
+        self.compile(
             loss=loss_function(
-                second_to_last_layer=self._get_second_to_last_layer(),
-                emd_weight_head_start=self.emd_weight_head_start,
+                model=self,
                 **loss_function_kwargs
             ),
             optimizer=self._OPTIMIZER(
@@ -76,11 +89,11 @@ class EvaluationModel(ABC):
             run_eagerly=True
         )
 
-    def predict(self, **kwargs):
-        return self.model.predict(**kwargs)
+    def test(self, **kwargs):
+        return self.predict(**kwargs)
 
-    def fit(self, **kwargs):
-        return self.model.fit(
+    def train(self, **kwargs):
+        return self.fit(
             callbacks=[
                 self.emd_weight_head_start,
                 get_checkpoint_file(

@@ -60,7 +60,7 @@ def evaluate(
         train_generator: ImageDataGenerator,
         validation_generator: ImageDataGenerator
 ) -> None:
-    model.fit(
+    model.train(
         x=train_generator,
         epochs=50,
         validation_data=validation_generator,

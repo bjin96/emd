@@ -4,7 +4,6 @@ import numpy as np
 
 from tensorflow.keras.activations import relu, softmax, linear
 from tensorflow.keras.layers import Conv2D, Layer, BatchNormalization, Dropout, Dense, ReLU, Flatten, AvgPool2D
-from tensorflow.keras.models import Sequential
 from tensorflow import TensorShape
 
 from models.evaluation_model import EvaluationModel
@@ -19,19 +18,16 @@ class Res(EvaluationModel):
             number_of_classes: int,
             final_activation: Union[softmax, linear]
     ):
-        wrn = WideResidualNetwork(
+        self.wrn = WideResidualNetwork(
             group_size=13,
             activation=ReLU,
             input_shape=(227, 227, 3)
         )
-        self.model = Sequential()
-        self.model.add(wrn)
-        self.model.add(Flatten())
-        self.model.add(Dense(128, activation=relu))
-        self.model.add(Dropout(0.2))
-        self.model.add(Dense(128, activation=relu))
-        self.model.add(Dropout(0.2))
-        self.model.add(Dense(number_of_classes, activation=final_activation))
+        self.dense1 = Dense(128, activation=relu)
+        self.dropout1 = Dropout(0.2)
+        self.dense2 = Dense(128, activation=relu)
+        self.dropout2 = Dropout(0.2)
+        self.dense3 = Dense(number_of_classes, activation=final_activation)
 
 
 class Resf(EvaluationModel):
@@ -56,9 +52,9 @@ class BasicLayer(Layer):
         self.k = k
 
     def call(self, inputs, **kwargs):
-        x = self.sub_layers[0](inputs)
+        x = self.sub_layers[0](inputs, **kwargs)
         for layer in self.sub_layers[1:]:
-            x = layer(x)
+            x = layer(x, **kwargs)
         return x
 
     def compute_output_shape(self, input_shape):
