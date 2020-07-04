@@ -63,8 +63,7 @@ class EmdWeightHeadStart(Callback):
 
 
 def self_guided_earth_mover_distance(
-        second_to_last_layer: K.placeholder,
-        emd_weight_head_start: EmdWeightHeadStart,
+        model,
         ground_distance_sensitivity: float,
         ground_distance_bias: float
 ) -> Callable:
@@ -73,12 +72,12 @@ def self_guided_earth_mover_distance(
             y_true: K.placeholder,
             y_pred: K.placeholder
     ) -> K.placeholder:
-        class_features = second_to_last_layer
+        class_features = model.second_to_last_layer
         cross_entropy_loss = categorical_crossentropy(
             y_true=y_true,
             y_pred=y_pred
         )
-        if emd_weight_head_start.emd_weight:
+        if model.emd_weight_head_start.emd_weight:
             self_guided_emd_loss = _calculate_self_guided_loss(
                 y_true=y_true,
                 y_pred=y_pred,
@@ -87,7 +86,8 @@ def self_guided_earth_mover_distance(
                 class_features=class_features
             )
             loss_function_relation = (cross_entropy_loss / self_guided_emd_loss) / 3.5
-            return cross_entropy_loss + emd_weight_head_start.emd_weight * loss_function_relation * self_guided_emd_loss
+            return cross_entropy_loss \
+                + model.emd_weight_head_start.emd_weight * loss_function_relation * self_guided_emd_loss
         else:
             return cross_entropy_loss
 
