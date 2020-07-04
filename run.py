@@ -120,7 +120,7 @@ class AdienceXemd2:
         )
 
 
-class Aemd1:
+class AdienceAemd1:
     """Entropic regularizer = 0.1"""
 
     def vggf(self):
@@ -157,7 +157,7 @@ class Aemd1:
         )
 
 
-class Aemd2:
+class AdienceAemd2:
     """Entropic regularizer = 1"""
 
     def vggf(self):
@@ -194,7 +194,7 @@ class Aemd2:
         )
 
 
-class Aemd3:
+class AdienceAemd3:
     """Entropic regularizer = 10"""
 
     def vggf(self):
