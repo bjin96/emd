@@ -8,7 +8,7 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.callbacks import Callback
 from tensorflow.keras.losses import categorical_crossentropy
 
-GROUND_DISTANCE_FILE = Path('./ground_distance')
+GROUND_DISTANCE_FILE = Path('./ground_distance.npy')
 
 
 def earth_mover_distance(
