@@ -29,7 +29,8 @@ def earth_mover_distance(
 def approximate_earth_mover_distance(
         entropic_regularizer: float,
         distance_matrix: np.array,
-        matrix_scaling_operations: int = 100
+        matrix_scaling_operations: int = 100,
+        **kwargs
 ) -> Callable:
     """
     Wrapper for approximate earth mover distance.
@@ -43,9 +44,9 @@ def approximate_earth_mover_distance(
         km = k * distance_matrix
         u = tf.ones(y_true.shape) / y_true.shape[1]
         for _ in range(matrix_scaling_operations):
-            u = y_pred / (tf.exp(u @ k) @ k)
-        v = tf.exp(u * k)
-        return tf.reduce_sum(u * (v * km)) / y_true.shape[0]
+            u = y_pred / ((y_true / (u @ k)) @ k)
+        v = y_true / (u @ k)
+        return tf.reduce_sum(u * (v @ km)) / y_true.shape[0]
 
     return _approximate_earth_mover_distance
 
