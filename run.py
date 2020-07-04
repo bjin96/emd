@@ -1,3 +1,4 @@
+import fire
 from tensorflow.keras.activations import softmax
 from tensorflow.keras.activations import linear
 
@@ -23,158 +24,212 @@ if devices:
         print(e)
 
 
-def XE():
-    evaluate_adience_model(Vggf, cross_entropy, softmax)
-    evaluate_adience_model(Res, cross_entropy, softmax)
-    evaluate_adience_model(Alxs, cross_entropy, softmax)
+class AdienceXe:
+
+    def vggf(self):
+        evaluate_adience_model(Vggf, cross_entropy, softmax)
+
+    def res(self):
+        evaluate_adience_model(Res, cross_entropy, softmax)
+
+    def alxs(self):
+        evaluate_adience_model(Alxs, cross_entropy, softmax)
 
 
-def REG():
-    evaluate_adience_model(Vggf, l2_regression_loss, linear)
-    evaluate_adience_model(Res, l2_regression_loss, linear)
-    evaluate_adience_model(Alxs, l2_regression_loss, linear)
+class AdienceReg:
+
+    def vggf(self):
+        evaluate_adience_model(Vggf, l2_regression_loss, linear)
+
+    def res(self):
+        evaluate_adience_model(Res, l2_regression_loss, linear)
+
+    def alxs(self):
+        evaluate_adience_model(Alxs, l2_regression_loss, linear)
 
 
-def EMD():
-    evaluate_adience_model(Vggf, earth_mover_distance, softmax)
-    evaluate_adience_model(Res, earth_mover_distance, softmax)
-    evaluate_adience_model(Alxs, earth_mover_distance, softmax)
+class AdienceEmd:
+
+    def vggf(self):
+        evaluate_adience_model(Vggf, earth_mover_distance, softmax)
+
+    def res(self):
+        evaluate_adience_model(Res, earth_mover_distance, softmax)
+
+    def alxs(self):
+        evaluate_adience_model(Alxs, earth_mover_distance, softmax)
 
 
-def XEMD1():
-    evaluate_adience_model(
-        evaluation_model=Vggf,
-        loss_function=self_guided_earth_mover_distance,
-        final_activation=softmax,
-        ground_distance_sensitivity=1,
-        ground_distance_bias=0.5
-    )
-    evaluate_adience_model(
-        evaluation_model=Res,
-        loss_function=self_guided_earth_mover_distance,
-        final_activation=softmax,
-        ground_distance_sensitivity=1,
-        ground_distance_bias=0.5
-    )
-    evaluate_adience_model(
-        evaluation_model=Alxs,
-        loss_function=self_guided_earth_mover_distance,
-        final_activation=softmax,
-        ground_distance_sensitivity=1,
-        ground_distance_bias=0.5
-    )
+class AdienceXemd1:
+
+    def vggf(self):
+        evaluate_adience_model(
+            evaluation_model=Vggf,
+            loss_function=self_guided_earth_mover_distance,
+            final_activation=softmax,
+            ground_distance_sensitivity=1,
+            ground_distance_bias=0.5
+        )
+
+    def res(self):
+        evaluate_adience_model(
+            evaluation_model=Res,
+            loss_function=self_guided_earth_mover_distance,
+            final_activation=softmax,
+            ground_distance_sensitivity=1,
+            ground_distance_bias=0.5
+        )
+
+    def alxs(self):
+        evaluate_adience_model(
+            evaluation_model=Alxs,
+            loss_function=self_guided_earth_mover_distance,
+            final_activation=softmax,
+            ground_distance_sensitivity=1,
+            ground_distance_bias=0.5
+        )
 
 
-def XEMD2():
-    evaluate_adience_model(
-        evaluation_model=Vggf,
-        loss_function=self_guided_earth_mover_distance,
-        final_activation=softmax,
-        ground_distance_sensitivity=2,
-        ground_distance_bias=0.25
-    )
-    evaluate_adience_model(
-        evaluation_model=Res,
-        loss_function=self_guided_earth_mover_distance,
-        final_activation=softmax,
-        ground_distance_sensitivity=2,
-        ground_distance_bias=0.25
-    )
-    evaluate_adience_model(
-        evaluation_model=Alxs,
-        loss_function=self_guided_earth_mover_distance,
-        final_activation=softmax,
-        ground_distance_sensitivity=2,
-        ground_distance_bias=0.25
-    )
+class AdienceXemd2:
+
+    def vggf(self):
+        evaluate_adience_model(
+            evaluation_model=Vggf,
+            loss_function=self_guided_earth_mover_distance,
+            final_activation=softmax,
+            ground_distance_sensitivity=2,
+            ground_distance_bias=0.25
+        )
+
+    def res(self):
+        evaluate_adience_model(
+            evaluation_model=Res,
+            loss_function=self_guided_earth_mover_distance,
+            final_activation=softmax,
+            ground_distance_sensitivity=2,
+            ground_distance_bias=0.25
+        )
+
+    def alxs(self):
+        evaluate_adience_model(
+            evaluation_model=Alxs,
+            loss_function=self_guided_earth_mover_distance,
+            final_activation=softmax,
+            ground_distance_sensitivity=2,
+            ground_distance_bias=0.25
+        )
 
 
-def A_EMD():
-    ground_distance_matrix = load_ground_distance_matrix()
+class Aemd1:
+    """Entropic regularizer = 0.1"""
 
-    # Entropic regularizer = 0.1
-    evaluate_adience_model(
-        evaluation_model=Vggf,
-        loss_function=approximate_earth_mover_distance,
-        final_activation=softmax,
-        entropic_regularizer=0.1,
-        distance_matrix=ground_distance_matrix,
-        matrix_scaling_operations=100
-    )
-    evaluate_adience_model(
-        evaluation_model=Res,
-        loss_function=approximate_earth_mover_distance,
-        final_activation=softmax,
-        entropic_regularizer=0.1,
-        distance_matrix=ground_distance_matrix,
-        matrix_scaling_operations=100
-    )
-    evaluate_adience_model(
-        evaluation_model=Alxs,
-        loss_function=approximate_earth_mover_distance,
-        final_activation=softmax,
-        entropic_regularizer=0.1,
-        distance_matrix=ground_distance_matrix,
-        matrix_scaling_operations=100
-    )
+    def vggf(self):
+        ground_distance_matrix = load_ground_distance_matrix()
+        evaluate_adience_model(
+            evaluation_model=Vggf,
+            loss_function=approximate_earth_mover_distance,
+            final_activation=softmax,
+            entropic_regularizer=0.1,
+            distance_matrix=ground_distance_matrix,
+            matrix_scaling_operations=100
+        )
 
-    # Entropic regularizer = 1
-    evaluate_adience_model(
-        evaluation_model=Vggf,
-        loss_function=approximate_earth_mover_distance,
-        final_activation=softmax,
-        entropic_regularizer=1,
-        distance_matrix=ground_distance_matrix,
-        matrix_scaling_operations=100
-    )
-    evaluate_adience_model(
-        evaluation_model=Res,
-        loss_function=approximate_earth_mover_distance,
-        final_activation=softmax,
-        entropic_regularizer=1,
-        distance_matrix=ground_distance_matrix,
-        matrix_scaling_operations=100
-    )
-    evaluate_adience_model(
-        evaluation_model=Alxs,
-        loss_function=approximate_earth_mover_distance,
-        final_activation=softmax,
-        entropic_regularizer=1,
-        distance_matrix=ground_distance_matrix,
-        matrix_scaling_operations=100
-    )
+    def res(self):
+        ground_distance_matrix = load_ground_distance_matrix()
+        evaluate_adience_model(
+            evaluation_model=Res,
+            loss_function=approximate_earth_mover_distance,
+            final_activation=softmax,
+            entropic_regularizer=0.1,
+            distance_matrix=ground_distance_matrix,
+            matrix_scaling_operations=100
+        )
 
-    # Entropic regularizer = 10
-    evaluate_adience_model(
-        evaluation_model=Vggf,
-        loss_function=approximate_earth_mover_distance,
-        final_activation=softmax,
-        entropic_regularizer=10,
-        distance_matrix=ground_distance_matrix,
-        matrix_scaling_operations=100
-    )
-    evaluate_adience_model(
-        evaluation_model=Res,
-        loss_function=approximate_earth_mover_distance,
-        final_activation=softmax,
-        entropic_regularizer=10,
-        distance_matrix=ground_distance_matrix,
-        matrix_scaling_operations=100
-    )
-    evaluate_adience_model(
-        evaluation_model=Alxs,
-        loss_function=approximate_earth_mover_distance,
-        final_activation=softmax,
-        entropic_regularizer=10,
-        distance_matrix=ground_distance_matrix,
-        matrix_scaling_operations=100
-    )
+    def alxs(self):
+        ground_distance_matrix = load_ground_distance_matrix()
+        evaluate_adience_model(
+            evaluation_model=Alxs,
+            loss_function=approximate_earth_mover_distance,
+            final_activation=softmax,
+            entropic_regularizer=0.1,
+            distance_matrix=ground_distance_matrix,
+            matrix_scaling_operations=100
+        )
+
+
+class Aemd2:
+    """Entropic regularizer = 1"""
+
+    def vggf(self):
+        ground_distance_matrix = load_ground_distance_matrix()
+        evaluate_adience_model(
+            evaluation_model=Vggf,
+            loss_function=approximate_earth_mover_distance,
+            final_activation=softmax,
+            entropic_regularizer=1,
+            distance_matrix=ground_distance_matrix,
+            matrix_scaling_operations=100
+        )
+
+    def res(self):
+        ground_distance_matrix = load_ground_distance_matrix()
+        evaluate_adience_model(
+            evaluation_model=Res,
+            loss_function=approximate_earth_mover_distance,
+            final_activation=softmax,
+            entropic_regularizer=1,
+            distance_matrix=ground_distance_matrix,
+            matrix_scaling_operations=100
+        )
+
+    def alxs(self):
+        ground_distance_matrix = load_ground_distance_matrix()
+        evaluate_adience_model(
+            evaluation_model=Alxs,
+            loss_function=approximate_earth_mover_distance,
+            final_activation=softmax,
+            entropic_regularizer=1,
+            distance_matrix=ground_distance_matrix,
+            matrix_scaling_operations=100
+        )
+
+
+class Aemd3:
+    """Entropic regularizer = 10"""
+
+    def vggf(self):
+        ground_distance_matrix = load_ground_distance_matrix()
+        evaluate_adience_model(
+            evaluation_model=Vggf,
+            loss_function=approximate_earth_mover_distance,
+            final_activation=softmax,
+            entropic_regularizer=10,
+            distance_matrix=ground_distance_matrix,
+            matrix_scaling_operations=100
+        )
+
+    def res(self):
+        ground_distance_matrix = load_ground_distance_matrix()
+        evaluate_adience_model(
+            evaluation_model=Res,
+            loss_function=approximate_earth_mover_distance,
+            final_activation=softmax,
+            entropic_regularizer=10,
+            distance_matrix=ground_distance_matrix,
+            matrix_scaling_operations=100
+        )
+
+    def alxs(self):
+        ground_distance_matrix = load_ground_distance_matrix()
+        evaluate_adience_model(
+            evaluation_model=Alxs,
+            loss_function=approximate_earth_mover_distance,
+            final_activation=softmax,
+            entropic_regularizer=10,
+            distance_matrix=ground_distance_matrix,
+            matrix_scaling_operations=100
+            )
 
 
 if __name__ == "__main__":
-    XE()
-    REG()
-    EMD()
-    XEMD1()
-    XEMD2()
-    A_EMD()
+    fire.Fire()
