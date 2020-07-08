@@ -1,4 +1,3 @@
-import fire
 from tensorflow.keras.activations import softmax
 from tensorflow.keras.activations import linear
 
@@ -232,4 +231,4 @@ class AdienceAemd3:
 
 
 if __name__ == "__main__":
-    fire.Fire()
+    pass
