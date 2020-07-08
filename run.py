@@ -2,7 +2,6 @@ from tensorflow.keras.activations import softmax
 from tensorflow.keras.activations import linear
 
 from evaluation.adience import evaluate_adience_model
-import tensorflow as tf
 
 from loss_functions.crossentropy import cross_entropy
 from loss_functions.emd import earth_mover_distance, self_guided_earth_mover_distance, approximate_earth_mover_distance, \
@@ -11,16 +10,6 @@ from loss_functions.regression import l2_regression_loss
 from models.alx import Alxs
 from models.res import Res
 from models.vgg import Vggf
-
-devices = tf.config.experimental.list_physical_devices('GPU')
-if devices:
-    try:
-        tf.config.experimental.set_virtual_device_configuration(
-            devices[0],
-            [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=4096)]
-        )
-    except RuntimeError as e:
-        print(e)
 
 
 class AdienceXe:
