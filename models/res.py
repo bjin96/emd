@@ -3,7 +3,7 @@ from typing import Union, ClassVar
 import numpy as np
 
 from tensorflow.keras.activations import relu, softmax, linear
-from tensorflow.keras.layers import Conv2D, Layer, BatchNormalization, Dropout, Dense, ReLU, Flatten, AvgPool2D
+from tensorflow.keras.layers import Conv2D, Layer, BatchNormalization, Dropout, Dense, ReLU, AvgPool2D
 from tensorflow import TensorShape
 
 from models.evaluation_model import EvaluationModel

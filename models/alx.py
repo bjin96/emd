@@ -1,7 +1,7 @@
 from typing import Union, ClassVar
 
 from tensorflow.keras import Input
-from tensorflow.keras.models import Sequential, Model
+from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Conv2D, MaxPool2D, Flatten, Dense, Dropout, Layer,Concatenate
 from tensorflow.keras.activations import relu, softmax, linear
 from tensorflow.python.ops.nn_ops import local_response_normalization

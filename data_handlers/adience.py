@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import List, Tuple
 
@@ -6,7 +7,7 @@ import numpy as np
 
 from data_handlers.generators import Y_COLUMN, X_COLUMN
 
-FOLD_DIR = Path('./datasets/adience/')
+FOLD_DIR = os.path.dirname(__file__) / Path('../datasets/adience/')
 FOLD_0_FILE = FOLD_DIR / Path('fold_0_data.csv')
 FOLD_1_FILE = FOLD_DIR / Path('fold_1_data.csv')
 FOLD_2_FILE = FOLD_DIR / Path('fold_2_data.csv')
@@ -27,7 +28,7 @@ ADIENCE_VALIDATION_FOLDS_INFO_FILES = [
     VALIDATION_0_INFO_FILE, VALIDATION_1_INFO_FILE, VALIDATION_2_INFO_FILE, VALIDATION_3_INFO_FILE,
     VALIDATION_4_INFO_FILE
 ]
-IMAGES_DIR = './datasets/adience/faces/'
+IMAGES_DIR = os.path.dirname(__file__) / Path('../datasets/adience/faces/')
 IMAGES_PREFIX = 'coarse_tilt_aligned_face.'
 
 ADIENCE_CLASSES = ["(0, 2)", "(4, 6)", "(8, 12)", "(15, 20)", "(25, 32)", "(38, 43)", "(48, 53)", "(60, 100)"]
@@ -66,7 +67,7 @@ def build_image_path_series(
         info: pd.DataFrame
 ) -> pd.Series:
     return pd.Series(
-        data=IMAGES_DIR + info['user_id'] + '/' + IMAGES_PREFIX + info['face_id'].astype(str)
+        data=str(IMAGES_DIR) + '/' + info['user_id'] + '/' + IMAGES_PREFIX + info['face_id'].astype(str)
         + '.' + info['original_image'],
         name=X_COLUMN
     )

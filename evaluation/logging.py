@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from pathlib import Path
 
@@ -5,8 +6,8 @@ from tensorflow.keras.callbacks import TensorBoard, ModelCheckpoint
 
 from data_handlers.data_set_info import DatasetName
 
-LOG_DIR = Path('./logs')
-CHECKPOINT_DIR = Path('./checkpoints')
+LOG_DIR = os.path.dirname(__file__) / Path('../logs')
+CHECKPOINT_DIR = os.path.dirname(__file__) / Path('../checkpoints')
 
 
 def get_tensorboard_callback(
