@@ -14,25 +14,26 @@ from models.evaluation_model import EvaluationModel
 
 def evaluate_adience_model(
         evaluation_model: Type[EvaluationModel],
+        learning_rate_index: int,
+        fold_index: int,
         loss_function: Callable,
         final_activation: Union[softmax, linear],
         **loss_function_kwargs
 ):
-    for i, _ in enumerate(ADIENCE_TRAIN_FOLDS_INFO_FILES):
-        for learning_rate in LEARNING_RATES:
-            model = evaluation_model(
-                number_of_classes=len(ADIENCE_CLASSES),
-                dataset_name=DatasetName.ADIENCE,
-                final_activation=final_activation,
-                loss_function=loss_function,
-                learning_rate=learning_rate,
-                **loss_function_kwargs
-            )
-            evaluate_adience_fold(
-                model=model,
-                train_fold_info_files=ADIENCE_TRAIN_FOLDS_INFO_FILES[i],
-                validation_fold_info_file=ADIENCE_VALIDATION_FOLDS_INFO_FILES[i]
-            )
+    model = evaluation_model(
+        number_of_classes=len(ADIENCE_CLASSES),
+        dataset_name=DatasetName.ADIENCE,
+        final_activation=final_activation,
+        loss_function=loss_function,
+        learning_rate=LEARNING_RATES[learning_rate_index],
+        fold_index=fold_index,
+        **loss_function_kwargs
+    )
+    evaluate_adience_fold(
+        model=model,
+        train_fold_info_files=ADIENCE_TRAIN_FOLDS_INFO_FILES[fold_index],
+        validation_fold_info_file=ADIENCE_VALIDATION_FOLDS_INFO_FILES[fold_index]
+    )
 
 
 def evaluate_adience_fold(

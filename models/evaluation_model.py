@@ -32,11 +32,13 @@ class EvaluationModel(ABC, Model):
             final_activation: Union[softmax, linear],
             loss_function: Callable,
             learning_rate: float,
+            fold_index: int,
             **loss_function_kwargs,
     ):
         super(EvaluationModel, self).__init__()
         self.number_of_classes = number_of_classes
         self.learning_rate = learning_rate
+        self.fold_index = fold_index
         self.dataset_name = dataset_name
         self.second_to_last_layer = None
 
@@ -99,12 +101,14 @@ class EvaluationModel(ABC, Model):
                 get_checkpoint_file(
                     data_set_name=self.dataset_name,
                     learning_rate=self.learning_rate,
-                    model_name=self._MODEL_NAME
+                    model_name=self._MODEL_NAME,
+                    fold_index=self.fold_index
                 ),
                 get_tensorboard_callback(
                     data_set_name=self.dataset_name,
                     learning_rate=self.learning_rate,
-                    model_name=self._MODEL_NAME
+                    model_name=self._MODEL_NAME,
+                    fold_index=self.fold_index
                 )
             ],
             **kwargs

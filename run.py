@@ -15,7 +15,7 @@ from models.vgg import Vggf
 class AdienceXe:
 
     def vggf(self):
-        evaluate_adience_model(Vggf, cross_entropy, softmax)
+        evaluate_adience_model(Vggf, 0, 0, cross_entropy, softmax)
 
     def res(self):
         evaluate_adience_model(Res, cross_entropy, softmax)
@@ -220,4 +220,5 @@ class AdienceAemd3:
 
 
 if __name__ == "__main__":
-    pass
+    adience_xe = AdienceXe()
+    adience_xe.vggf()
