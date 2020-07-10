@@ -65,4 +65,6 @@ def evaluate(
         x=train_generator,
         epochs=160,
         validation_data=validation_generator,
+        steps_per_epoch=450,
+        validation_steps=100
     )
