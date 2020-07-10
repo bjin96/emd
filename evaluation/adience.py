@@ -62,6 +62,6 @@ def evaluate(
 ) -> None:
     model.train(
         x=train_generator,
-        epochs=50,
+        epochs=160,
         validation_data=validation_generator,
     )
