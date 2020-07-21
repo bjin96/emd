@@ -88,7 +88,7 @@ class EvaluationModel(ABC, Model):
                 momentum=self._OPTIMIZER_MOMENTUM
             ),
             metrics=self._METRICS,
-            run_eagerly=True
+            run_eagerly=False
         )
 
     def test(self, **kwargs):
