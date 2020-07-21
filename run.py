@@ -4,8 +4,8 @@ from tensorflow.keras.activations import linear
 from evaluation.adience import evaluate_adience_model
 
 from loss_functions.crossentropy import cross_entropy
-from loss_functions.emd import earth_mover_distance, self_guided_earth_mover_distance, approximate_earth_mover_distance, \
-    load_ground_distance_matrix
+from loss_functions.emd import earth_mover_distance, self_guided_earth_mover_distance, \
+    approximate_earth_mover_distance, load_ground_distance_matrix
 from loss_functions.regression import l2_regression_loss
 from models.alx import Alxs
 from models.res import Res
@@ -14,63 +14,81 @@ from models.vgg import Vggf
 
 class AdienceXe:
 
-    def vggf(self):
-        evaluate_adience_model(Vggf, 0, 0, cross_entropy, softmax)
+    @staticmethod
+    def vggf(lr_index, fold_index):
+        evaluate_adience_model(Vggf, lr_index, fold_index, cross_entropy, softmax)
 
-    def res(self):
-        evaluate_adience_model(Res, cross_entropy, softmax)
+    @staticmethod
+    def res(lr_index, fold_index):
+        evaluate_adience_model(Res, lr_index, fold_index, cross_entropy, softmax)
 
-    def alxs(self):
-        evaluate_adience_model(Alxs, cross_entropy, softmax)
+    @staticmethod
+    def alxs(lr_index, fold_index):
+        evaluate_adience_model(Alxs, lr_index, fold_index, cross_entropy, softmax)
 
 
 class AdienceReg:
 
-    def vggf(self):
-        evaluate_adience_model(Vggf, l2_regression_loss, linear)
+    @staticmethod
+    def vggf(lr_index, fold_index):
+        evaluate_adience_model(Vggf, lr_index, fold_index, l2_regression_loss, linear)
 
-    def res(self):
-        evaluate_adience_model(Res, l2_regression_loss, linear)
+    @staticmethod
+    def res(lr_index, fold_index):
+        evaluate_adience_model(Res, lr_index, fold_index, l2_regression_loss, linear)
 
-    def alxs(self):
-        evaluate_adience_model(Alxs, l2_regression_loss, linear)
+    @staticmethod
+    def alxs(lr_index, fold_index):
+        evaluate_adience_model(Alxs, lr_index, fold_index, l2_regression_loss, linear)
 
 
 class AdienceEmd:
 
-    def vggf(self):
-        evaluate_adience_model(Vggf, earth_mover_distance, softmax)
+    @staticmethod
+    def vggf(lr_index, fold_index):
+        evaluate_adience_model(Vggf, lr_index, fold_index, earth_mover_distance, softmax)
 
-    def res(self):
-        evaluate_adience_model(Res, earth_mover_distance, softmax)
+    @staticmethod
+    def res(lr_index, fold_index):
+        evaluate_adience_model(Res, lr_index, fold_index, earth_mover_distance, softmax)
 
-    def alxs(self):
-        evaluate_adience_model(Alxs, earth_mover_distance, softmax)
+    @staticmethod
+    def alxs(lr_index, fold_index):
+        evaluate_adience_model(Alxs, lr_index, fold_index, earth_mover_distance, softmax)
 
 
 class AdienceXemd1:
 
-    def vggf(self):
+    @staticmethod
+    def vggf(lr_index, fold_index):
         evaluate_adience_model(
             evaluation_model=Vggf,
+            learning_rate_index=lr_index,
+            fold_index=fold_index,
             loss_function=self_guided_earth_mover_distance,
             final_activation=softmax,
             ground_distance_sensitivity=1,
             ground_distance_bias=0.5
         )
 
-    def res(self):
+    @staticmethod
+    def res(lr_index, fold_index):
         evaluate_adience_model(
             evaluation_model=Res,
+            learning_rate_index=lr_index,
+            fold_index=fold_index,
             loss_function=self_guided_earth_mover_distance,
             final_activation=softmax,
             ground_distance_sensitivity=1,
             ground_distance_bias=0.5
         )
 
-    def alxs(self):
+    @staticmethod
+    def alxs(lr_index, fold_index):
         evaluate_adience_model(
             evaluation_model=Alxs,
+            learning_rate_index=lr_index,
+            fold_index=fold_index,
             loss_function=self_guided_earth_mover_distance,
             final_activation=softmax,
             ground_distance_sensitivity=1,
@@ -80,27 +98,36 @@ class AdienceXemd1:
 
 class AdienceXemd2:
 
-    def vggf(self):
+    @staticmethod
+    def vggf(lr_index, fold_index):
         evaluate_adience_model(
             evaluation_model=Vggf,
+            learning_rate_index=lr_index,
+            fold_index=fold_index,
             loss_function=self_guided_earth_mover_distance,
             final_activation=softmax,
             ground_distance_sensitivity=2,
             ground_distance_bias=0.25
         )
 
-    def res(self):
+    @staticmethod
+    def res(lr_index, fold_index):
         evaluate_adience_model(
             evaluation_model=Res,
+            learning_rate_index=lr_index,
+            fold_index=fold_index,
             loss_function=self_guided_earth_mover_distance,
             final_activation=softmax,
             ground_distance_sensitivity=2,
             ground_distance_bias=0.25
         )
 
-    def alxs(self):
+    @staticmethod
+    def alxs(lr_index, fold_index):
         evaluate_adience_model(
             evaluation_model=Alxs,
+            learning_rate_index=lr_index,
+            fold_index=fold_index,
             loss_function=self_guided_earth_mover_distance,
             final_activation=softmax,
             ground_distance_sensitivity=2,
@@ -111,10 +138,13 @@ class AdienceXemd2:
 class AdienceAemd1:
     """Entropic regularizer = 0.1"""
 
-    def vggf(self):
+    @staticmethod
+    def vggf(lr_index, fold_index):
         ground_distance_matrix = load_ground_distance_matrix()
         evaluate_adience_model(
             evaluation_model=Vggf,
+            learning_rate_index=lr_index,
+            fold_index=fold_index,
             loss_function=approximate_earth_mover_distance,
             final_activation=softmax,
             entropic_regularizer=0.1,
@@ -122,10 +152,13 @@ class AdienceAemd1:
             matrix_scaling_operations=100
         )
 
-    def res(self):
+    @staticmethod
+    def res(lr_index, fold_index):
         ground_distance_matrix = load_ground_distance_matrix()
         evaluate_adience_model(
             evaluation_model=Res,
+            learning_rate_index=lr_index,
+            fold_index=fold_index,
             loss_function=approximate_earth_mover_distance,
             final_activation=softmax,
             entropic_regularizer=0.1,
@@ -133,10 +166,13 @@ class AdienceAemd1:
             matrix_scaling_operations=100
         )
 
-    def alxs(self):
+    @staticmethod
+    def alxs(lr_index, fold_index):
         ground_distance_matrix = load_ground_distance_matrix()
         evaluate_adience_model(
             evaluation_model=Alxs,
+            learning_rate_index=lr_index,
+            fold_index=fold_index,
             loss_function=approximate_earth_mover_distance,
             final_activation=softmax,
             entropic_regularizer=0.1,
@@ -148,10 +184,13 @@ class AdienceAemd1:
 class AdienceAemd2:
     """Entropic regularizer = 1"""
 
-    def vggf(self):
+    @staticmethod
+    def vggf(lr_index, fold_index):
         ground_distance_matrix = load_ground_distance_matrix()
         evaluate_adience_model(
             evaluation_model=Vggf,
+            learning_rate_index=lr_index,
+            fold_index=fold_index,
             loss_function=approximate_earth_mover_distance,
             final_activation=softmax,
             entropic_regularizer=1,
@@ -159,10 +198,13 @@ class AdienceAemd2:
             matrix_scaling_operations=100
         )
 
-    def res(self):
+    @staticmethod
+    def res(lr_index, fold_index):
         ground_distance_matrix = load_ground_distance_matrix()
         evaluate_adience_model(
             evaluation_model=Res,
+            learning_rate_index=lr_index,
+            fold_index=fold_index,
             loss_function=approximate_earth_mover_distance,
             final_activation=softmax,
             entropic_regularizer=1,
@@ -170,10 +212,13 @@ class AdienceAemd2:
             matrix_scaling_operations=100
         )
 
-    def alxs(self):
+    @staticmethod
+    def alxs(lr_index, fold_index):
         ground_distance_matrix = load_ground_distance_matrix()
         evaluate_adience_model(
             evaluation_model=Alxs,
+            learning_rate_index=lr_index,
+            fold_index=fold_index,
             loss_function=approximate_earth_mover_distance,
             final_activation=softmax,
             entropic_regularizer=1,
@@ -185,10 +230,13 @@ class AdienceAemd2:
 class AdienceAemd3:
     """Entropic regularizer = 10"""
 
-    def vggf(self):
+    @staticmethod
+    def vggf(lr_index, fold_index):
         ground_distance_matrix = load_ground_distance_matrix()
         evaluate_adience_model(
             evaluation_model=Vggf,
+            learning_rate_index=lr_index,
+            fold_index=fold_index,
             loss_function=approximate_earth_mover_distance,
             final_activation=softmax,
             entropic_regularizer=10,
@@ -196,10 +244,13 @@ class AdienceAemd3:
             matrix_scaling_operations=100
         )
 
-    def res(self):
+    @staticmethod
+    def res(lr_index, fold_index):
         ground_distance_matrix = load_ground_distance_matrix()
         evaluate_adience_model(
             evaluation_model=Res,
+            learning_rate_index=lr_index,
+            fold_index=fold_index,
             loss_function=approximate_earth_mover_distance,
             final_activation=softmax,
             entropic_regularizer=10,
@@ -207,10 +258,13 @@ class AdienceAemd3:
             matrix_scaling_operations=100
         )
 
-    def alxs(self):
+    @staticmethod
+    def alxs(lr_index, fold_index):
         ground_distance_matrix = load_ground_distance_matrix()
         evaluate_adience_model(
             evaluation_model=Alxs,
+            learning_rate_index=lr_index,
+            fold_index=fold_index,
             loss_function=approximate_earth_mover_distance,
             final_activation=softmax,
             entropic_regularizer=10,
@@ -220,5 +274,4 @@ class AdienceAemd3:
 
 
 if __name__ == "__main__":
-    adience_xe = AdienceXe()
-    adience_xe.vggf()
+    pass
