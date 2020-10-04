@@ -2,8 +2,8 @@ from typing import Union, ClassVar
 
 import numpy as np
 
-from tensorflow.keras.activations import relu, softmax, linear
-from tensorflow.keras.layers import Conv2D, Layer, BatchNormalization, Dropout, Dense, ReLU, AvgPool2D
+from tensorflow.keras.activations import softmax, linear
+from tensorflow.keras.layers import Conv2D, Layer, BatchNormalization, Dense, ReLU, AvgPool2D
 from tensorflow import TensorShape
 
 from models.evaluation_model import EvaluationModel
@@ -23,10 +23,6 @@ class Res(EvaluationModel):
             activation=ReLU,
             input_shape=(227, 227, 3)
         )
-        self.dense1 = Dense(128, activation=relu)
-        self.dropout1 = Dropout(0.2)
-        self.dense2 = Dense(128, activation=relu)
-        self.dropout2 = Dropout(0.2)
         self.dense3 = Dense(number_of_classes, activation=final_activation)
 
 
