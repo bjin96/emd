@@ -1,6 +1,29 @@
-from typing import Callable
+from typing import Callable, List
 
 import numpy as np
+import tensorflow as tf
+
+
+def process_custom_preprocessing(
+        preprocessing_functions: List[Callable[[np.array], np.array]]
+) -> Callable[[np.array], np.array]:
+    """
+    Function for aggregating multiple custom preprocessing functions for a
+    tf.keras.preprocessing.image.ImageDataGenerator.
+
+    :param preprocessing_functions: List of custom preprocessing functions.
+
+    :return: Aggregate preprocessing function processing all functionality from the passed functions.
+    """
+    def _process_custom_preprocessing(
+            image: np.array
+    ) -> np.array:
+        processed_image = image.copy()
+        for preprocessing_function in preprocessing_functions:
+            processed_image = preprocessing_function(processed_image)
+        return processed_image
+
+    return _process_custom_preprocessing
 
 
 def adjust_aspect_ratio(
@@ -12,9 +35,8 @@ def adjust_aspect_ratio(
     :param aspect_ratio_range: Maximum amount of adjustment for the aspect ratio change in percent. The applied aspect
     ratio change for a specific image can be negative as well as positive.
 
-    :return: The input image with the new aspect ratio and padded to be of the original shape.
+    :return: A function that adjusts the input image to the new aspect ratio and pads the output to the original shape.
     """
-
     def _adjust_aspect_ratio(
             image: np.array
     ) -> np.array:
@@ -42,3 +64,25 @@ def adjust_aspect_ratio(
         return np.where(mask, image, 0)
 
     return _adjust_aspect_ratio
+
+
+def crop_to_central_image(
+        central_fraction: float
+) -> Callable[[np.array], np.array]:
+    """
+    Returns a function that crops an image to the specified fraction of the original image. The crop is taken from the
+    center of the original image.
+
+    :param central_fraction: Fraction of the image to which the image should be cropped.
+
+    :return: A function that crops the image to the desired fraction of the original image.
+    """
+    def _crop_to_central_image(
+            image: np.array
+    ) -> np.array:
+        return tf.image.central_crop(
+            image=image,
+            central_fraction=central_fraction
+        )
+
+    return _crop_to_central_image

@@ -4,7 +4,7 @@ import pandas as pd
 
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-from data_handlers.preprocessing import adjust_aspect_ratio
+from data_handlers.preprocessing import adjust_aspect_ratio, process_custom_preprocessing, crop_to_central_image
 
 X_COLUMN = 'x_col'
 Y_COLUMN = 'y_col'
@@ -18,7 +18,12 @@ def get_generators(
         rotation_range=20,
         horizontal_flip=True,
         channel_shift_range=10.,
-        preprocessing_function=adjust_aspect_ratio(10)
+        preprocessing_function=process_custom_preprocessing(
+            preprocessing_functions=[
+                crop_to_central_image(70.),
+                adjust_aspect_ratio(10.)
+            ]
+        )
     ).flow_from_dataframe(
         dataframe=train_info,
         target_size=(227, 227),
@@ -26,7 +31,8 @@ def get_generators(
         y_col=Y_COLUMN
     )
     validation_generator = ImageDataGenerator(
-        horizontal_flip=True
+        horizontal_flip=True,
+        preprocessing_function=crop_to_central_image(70.)
     ).flow_from_dataframe(
         dataframe=validation_info,
         target_size=(227, 227),
