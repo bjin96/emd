@@ -21,8 +21,6 @@ class Vggf(EvaluationModel):
             input_shape=(227, 227, 3),
             pooling='avg'
         )
-        self.dense1 = Dense(128, activation=relu)
-        self.dropout1 = Dropout(0.2)
-        self.dense2 = Dense(128, activation=relu)
-        self.dropout2 = Dropout(0.2)
+        self.dense1 = Dense(4096, activation=relu)
+        self.dense2 = Dense(4096, activation=relu)
         self.dense3 = Dense(number_of_classes, activation=final_activation)
