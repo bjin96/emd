@@ -4,7 +4,8 @@ import pandas as pd
 
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-from data_handlers.preprocessing import adjust_aspect_ratio, process_custom_preprocessing, crop_to_central_image
+from data_handlers.preprocessing import adjust_aspect_ratio, process_custom_preprocessing, crop_to_central_image, \
+    rescale_image
 
 X_COLUMN = 'x_col'
 Y_COLUMN = 'y_col'
@@ -20,7 +21,8 @@ def get_generators(
         channel_shift_range=10.,
         preprocessing_function=process_custom_preprocessing(
             preprocessing_functions=[
-                crop_to_central_image(70.),
+                rescale_image([255, 255]),
+                crop_to_central_image(89.),
                 adjust_aspect_ratio(10.)
             ]
         )
@@ -32,7 +34,12 @@ def get_generators(
     )
     validation_generator = ImageDataGenerator(
         horizontal_flip=True,
-        preprocessing_function=crop_to_central_image(70.)
+        preprocessing_function=process_custom_preprocessing(
+            preprocessing_functions=[
+                rescale_image([255, 255]),
+                crop_to_central_image(89.)
+            ]
+        )
     ).flow_from_dataframe(
         dataframe=validation_info,
         target_size=(227, 227),

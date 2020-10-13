@@ -77,6 +77,8 @@ def crop_to_central_image(
 
     :return: A function that crops the image to the desired fraction of the original image.
     """
+    central_fraction = central_fraction / 100.
+
     def _crop_to_central_image(
             image: np.array
     ) -> np.array:
@@ -86,3 +88,24 @@ def crop_to_central_image(
         )
 
     return _crop_to_central_image
+
+
+def rescale_image(
+        target_size: List
+) -> Callable[[np.array], np.array]:
+    """
+    Returns a function that rescales an image to the specified target resolution.
+
+    :param target_size: Target resolution.
+
+    :return: Rescaled image.
+    """
+    def _rescale_image(
+            image: np.array
+    ) -> np.array:
+        return tf.image.resize(
+            images=image,
+            size=target_size
+        )
+
+    return _rescale_image
