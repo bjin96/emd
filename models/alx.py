@@ -4,6 +4,7 @@ from tensorflow.keras import Input
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Conv2D, MaxPool2D, Flatten, Dense, Dropout, Layer,Concatenate
 from tensorflow.keras.activations import relu, softmax, linear
+from tensorflow.keras.regularizers import l2
 from tensorflow.python.ops.nn_ops import local_response_normalization
 
 from models.evaluation_model import EvaluationModel
@@ -23,6 +24,8 @@ class Alxs(EvaluationModel):
             filters=96,
             kernel_size=(7, 7),
             strides=4,
+            kernel_regularizer=l2(1e-20),
+            bias_regularizer=l2(1e-20),
             activation=relu
         )
         self.pool1 = MaxPool2D(
@@ -35,6 +38,8 @@ class Alxs(EvaluationModel):
             filters=256,
             kernel_size=(5, 5),
             padding='same',
+            kernel_regularizer=l2(1e-20),
+            bias_regularizer=l2(1e-20),
             activation=relu
         )
         self.pool2 = MaxPool2D(
@@ -47,6 +52,8 @@ class Alxs(EvaluationModel):
             filters=384,
             kernel_size=(3, 3),
             padding='same',
+            kernel_regularizer=l2(1e-20),
+            bias_regularizer=l2(1e-20),
             activation=relu
         )
         self.pool3 = MaxPool2D(
@@ -57,16 +64,22 @@ class Alxs(EvaluationModel):
         self.flatten = Flatten()
         self.dense1 = Dense(
             units=512,
+            kernel_regularizer=l2(1e-20),
+            bias_regularizer=l2(1e-20),
             activation=relu
         )
         self.dropout1 = Dropout(0.5)
         self.dense2 = Dense(
             units=512,
+            kernel_regularizer=l2(1e-20),
+            bias_regularizer=l2(1e-20),
             activation=relu
         )
         self.dropout2 = Dropout(0.5)
         self.dense3 = Dense(
             units=number_of_classes,
+            kernel_regularizer=l2(1e-20),
+            bias_regularizer=l2(1e-20),
             activation=final_activation
         )
 
