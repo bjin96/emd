@@ -6,6 +6,7 @@ from tensorflow.keras import Model
 from tensorflow.keras.activations import linear, softmax
 from tensorflow.keras.metrics import categorical_accuracy
 from tensorflow.keras.optimizers import SGD, Optimizer
+from tensorflow.keras.optimizers.schedules import ExponentialDecay
 from tensorflow import TensorShape
 
 from data_handlers.data_set_info import DatasetName
@@ -78,13 +79,19 @@ class EvaluationModel(ABC, Model):
             **loss_function_kwargs
     ):
         self.emd_weight_head_start = EmdWeightHeadStart()
+        lr_schedule = ExponentialDecay(
+            self.learning_rate,
+            decay_steps=465,
+            decay_rate=0.995
+        )
         self.compile(
             loss=loss_function(
                 model=self,
                 **loss_function_kwargs
             ),
             optimizer=self._OPTIMIZER(
-                learning_rate=self.learning_rate,
+                learning_rate=lr_schedule,
+                nesterov=True,
                 momentum=self._OPTIMIZER_MOMENTUM
             ),
             metrics=self._METRICS,
