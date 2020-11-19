@@ -71,7 +71,16 @@ class EvaluationModel(ABC, Model):
         for layer in self.layers[:-2]:
             y = layer(y, **kwargs)
         self.second_to_last_layer = self.layers[-2](y, **kwargs)
-        return self.layers[-1](self.second_to_last_layer, **kwargs)
+        output = self.layers[-1](self.second_to_last_layer, **kwargs)
+        if not kwargs['training']:
+            y = inputs[:, :, ::-1, :]
+            for layer in self.layers[:-2]:
+                y = layer(y, **kwargs)
+            self.second_to_last_layer = self.layers[-2](y, **kwargs)
+            mirrored_output = self.layers[-1](self.second_to_last_layer, **kwargs)
+            return (mirrored_output + output) / 2
+        else:
+            return output
 
     def _compile_model(
             self,

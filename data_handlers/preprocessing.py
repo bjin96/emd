@@ -2,6 +2,11 @@ from typing import Callable, List
 
 import numpy as np
 import tensorflow as tf
+from PIL import Image
+import PIL
+
+from tensorflow.keras.callbacks import Callback
+from tensorflow.python.keras.models import Model
 
 
 def process_custom_preprocessing(
@@ -24,6 +29,80 @@ def process_custom_preprocessing(
         return processed_image
 
     return _process_custom_preprocessing
+
+
+def paper_preprocessing(img):
+    # crop
+    icut = 256 - 227
+    jcut = 256 - 227
+    ioff = np.random.randint(0, icut + 1)
+    joff = np.random.randint(0, jcut + 1)
+    img = img[ioff: ioff + img.shape[0] - icut, joff: joff + img.shape[1] - jcut]
+
+    # adjust color
+    adj_range = 0.15
+    rgb_mean = np.mean(img, axis=(0, 1), keepdims=True).astype(np.float32)
+    adj_magn = np.random.uniform(1 - adj_range, 1 + adj_range, (1, 1, 3)).astype(np.float32)
+    img = np.clip((img - rgb_mean) * adj_magn + rgb_mean + np.random.uniform(-1.0, 1.0, (1, 1, 3)) * 20, 0.0, 255.0)
+
+    # mirror
+    if np.random.rand(1)[0] < 0.5:
+        img = img[:, ::-1]
+
+    # scaling
+    if np.random.rand(1)[0] < 0.5:
+        iscale = 2 * (np.random.rand(1)[0] - 0.5) * 0.10 + 1.0
+        jscale = 2 * (np.random.rand(1)[0] - 0.5) * 0.10 + 1.0
+        img = np.array(
+            Image
+                .fromarray(img.astype(np.uint8))
+                .resize(
+                    size=(int(img.shape[0] * iscale), int(img.shape[1] * jscale)),
+                    resample=PIL.Image.BICUBIC
+                )
+        )
+
+    # rotate small degree
+    if np.random.rand(1)[0] < 0.9:
+        img = rotate_img(img)
+
+    img = zero_centering(img)
+    img = (img - 127.0) / 127.0
+
+    return img
+
+
+def zero_centering(img):
+    x0 = (img.shape[0] - 227) // 2
+    y0 = (img.shape[1] - 227) // 2
+    im = Image.fromarray(img.astype(np.uint8))
+    img = np.array(im.crop((x0, y0, x0+227, y0+227))).astype(np.float32)
+    return img
+
+
+def inverse_transform(X):
+    return X * 127.0 + 127.0
+
+
+def rotate_img(x):
+    rotate_angle = (np.random.rand(1)[0] - 0.5) * 2 * 20.0
+    im = Image.fromarray(x.astype(np.uint8))
+    x = np.array(im.rotate(rotate_angle, Image.BICUBIC)).astype(np.float32)
+    return x
+
+
+def paper_preprocessing_validation(img):
+    # crop
+    icut = 256 - 227
+    jcut = 256 - 227
+    ioff = int(icut // 2)
+    joff = int(jcut // 2)
+    img = img[ioff: ioff + img.shape[0] - icut, joff: joff + img.shape[1] - jcut]
+
+    img = zero_centering(img)
+    img = (img - 127.0) / 127.0
+
+    return img
 
 
 def adjust_aspect_ratio(
