@@ -2,11 +2,8 @@ from typing import Callable, List
 
 import numpy as np
 import tensorflow as tf
+import tensorflow_addons as tfa
 from PIL import Image
-import PIL
-
-from tensorflow.keras.callbacks import Callback
-from tensorflow.python.keras.models import Model
 
 
 def process_custom_preprocessing(
@@ -30,54 +27,69 @@ def process_custom_preprocessing(
 
     return _process_custom_preprocessing
 
-
-def paper_preprocessing(img):
+@tf.function
+def paper_preprocessing(img, label):
     # crop
     icut = 256 - 227
     jcut = 256 - 227
     ioff = np.random.randint(0, icut + 1)
     joff = np.random.randint(0, jcut + 1)
-    img = img[ioff: ioff + img.shape[0] - icut, joff: joff + img.shape[1] - jcut]
+    img = img[ioff: ioff + 256 - icut, joff: joff + 256 - jcut]
+    # tf.io.write_file('step1_crop.jpg', tf.io.encode_jpeg(tf.cast(img, tf.uint8)))
 
     # adjust color
     adj_range = 0.15
-    rgb_mean = np.mean(img, axis=(0, 1), keepdims=True).astype(np.float32)
-    adj_magn = np.random.uniform(1 - adj_range, 1 + adj_range, (1, 1, 3)).astype(np.float32)
-    img = np.clip((img - rgb_mean) * adj_magn + rgb_mean + np.random.uniform(-1.0, 1.0, (1, 1, 3)) * 20, 0.0, 255.0)
+    rgb_mean = tf.cast(tf.reduce_mean(img, axis=(0, 1), keepdims=True), tf.float32)
+    adj_magn = tf.random.uniform(minval=1 - adj_range, maxval=1 + adj_range, shape=(1, 1, 3))
+    img = tf.cast(img, tf.float32)
+    img = tf.clip_by_value((img - rgb_mean) * adj_magn + rgb_mean + tf.random.uniform((1, 1, 3), -1.0, 1.0) * 20, 0.0, 255.0)
+    # tf.io.write_file('step2_adjust_color.jpg', tf.io.encode_jpeg(tf.cast(img, tf.uint8)))
 
     # mirror
-    if np.random.rand(1)[0] < 0.5:
+    if tf.random.uniform([1])[0] < 0.5:
         img = img[:, ::-1]
+        # tf.io.write_file('step3_mirror.jpg', tf.io.encode_jpeg(tf.cast(img, tf.uint8)))
+
+    image_size = [227, 227]
 
     # scaling
-    if np.random.rand(1)[0] < 0.5:
-        iscale = 2 * (np.random.rand(1)[0] - 0.5) * 0.10 + 1.0
-        jscale = 2 * (np.random.rand(1)[0] - 0.5) * 0.10 + 1.0
-        img = np.array(
-            Image
-                .fromarray(img.astype(np.uint8))
-                .resize(
-                    size=(int(img.shape[0] * iscale), int(img.shape[1] * jscale)),
-                    resample=PIL.Image.BICUBIC
-                )
+    if tf.random.uniform([1])[0] < 0.5:
+        # tf.io.write_file('step4_scaling.jpg', tf.io.encode_jpeg(tf.cast(img, tf.uint8)))
+
+        iscale = 2 * (tf.random.uniform([1])[0] - 0.5) * 0.10 + 1.0
+        jscale = 2 * (tf.random.uniform([1])[0] - 0.5) * 0.10 + 1.0
+
+        image_size = [int(227 * iscale), int(227 * jscale)]
+        img = tf.image.resize(
+            images=img,
+            size=image_size,
+            method=tf.image.ResizeMethod.BICUBIC
         )
 
     # rotate small degree
-    if np.random.rand(1)[0] < 0.9:
-        img = rotate_img(img)
+    if tf.random.uniform([1])[0] < 0.9:
+        rotate_angle = (tf.random.uniform([1])[0] - 0.5) * 2 * 20.0
+        img = tfa.image.rotate(img, rotate_angle * np.pi / 180.)
+        # tf.io.write_file('step6_rotate.jpg', tf.io.encode_jpeg(tf.cast(img, tf.uint8)))
 
-    img = zero_centering(img)
+    img = zero_centering(img, image_size)
+    # tf.io.write_file('step7_zero_centered.jpg', tf.io.encode_jpeg(tf.cast(img, tf.uint8)))
+
     img = (img - 127.0) / 127.0
 
-    return img
+    return img, label
 
 
-def zero_centering(img):
-    x0 = (img.shape[0] - 227) // 2
-    y0 = (img.shape[1] - 227) // 2
-    im = Image.fromarray(img.astype(np.uint8))
-    img = np.array(im.crop((x0, y0, x0+227, y0+227))).astype(np.float32)
-    return img
+def zero_centering(img, image_size):
+    if image_size[0] < 227:
+        img = tf.image.pad_to_bounding_box(img, (227 - image_size[0]) // 2, 0, 227, image_size[1])
+        image_size[0] = 227
+    if image_size[1] < 227:
+        img = tf.image.pad_to_bounding_box(img, 0, (227 - image_size[1]) // 2, image_size[0], 227)
+        image_size[1] = 227
+    x0 = (image_size[0] - 227) // 2
+    y0 = (image_size[1] - 227) // 2
+    return tf.image.crop_to_bounding_box(img, x0, y0, 227, 227)
 
 
 def inverse_transform(X):
@@ -91,18 +103,19 @@ def rotate_img(x):
     return x
 
 
-def paper_preprocessing_validation(img):
+def paper_preprocessing_validation(img, label):
     # crop
     icut = 256 - 227
     jcut = 256 - 227
     ioff = int(icut // 2)
     joff = int(jcut // 2)
-    img = img[ioff: ioff + img.shape[0] - icut, joff: joff + img.shape[1] - jcut]
+    img = img[ioff: ioff + 256 - icut, joff: joff + 256 - jcut]
 
-    img = zero_centering(img)
+    img = tf.cast(img, tf.float32)
+
     img = (img - 127.0) / 127.0
 
-    return img
+    return img, label
 
 
 def adjust_aspect_ratio(

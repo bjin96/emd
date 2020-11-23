@@ -90,7 +90,7 @@ class EvaluationModel(ABC, Model):
         self.emd_weight_head_start = EmdWeightHeadStart()
         lr_schedule = ExponentialDecay(
             self.learning_rate,
-            decay_steps=465,
+            decay_steps=429,
             decay_rate=0.995
         )
         self.compile(
@@ -104,7 +104,7 @@ class EvaluationModel(ABC, Model):
                 momentum=self._OPTIMIZER_MOMENTUM
             ),
             metrics=self._METRICS,
-            run_eagerly=False
+            run_eagerly=True
         )
 
     def test(self, **kwargs):

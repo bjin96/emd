@@ -7,7 +7,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from data_handlers.adience import get_adience_info, ADIENCE_TRAIN_FOLDS_INFO_FILES, \
     ADIENCE_VALIDATION_FOLDS_INFO_FILES, ADIENCE_CLASSES
 from data_handlers.data_set_info import DatasetName
-from data_handlers.generators import get_generators
+from data_handlers.generators import custom_data_loading
 from models.constants import LEARNING_RATES
 from models.evaluation_model import EvaluationModel
 
@@ -45,7 +45,7 @@ def evaluate_adience_fold(
         train_fold_info_files=train_fold_info_files,
         validation_fold_info_file=validation_fold_info_file
     )
-    train_generator, validation_generator = get_generators(
+    train_generator, validation_generator = custom_data_loading(
         train_info=train_info,
         validation_info=validation_info
     )

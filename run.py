@@ -1,3 +1,4 @@
+import tensorflow as tf
 from tensorflow.keras.activations import softmax
 from tensorflow.keras.activations import linear
 
@@ -10,6 +11,16 @@ from loss_functions.regression import l2_regression_loss
 from models.alx import Alxs
 from models.res import Res
 from models.vgg import Vggf
+
+devices = tf.config.experimental.list_physical_devices('GPU')
+if devices:
+    try:
+        tf.config.experimental.set_virtual_device_configuration(
+            devices[0],
+            [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=8192)]
+        )
+    except RuntimeError as e:
+        print(e)
 
 
 class AdienceXe:
@@ -54,7 +65,13 @@ class AdienceEmd:
 
     @staticmethod
     def alxs(lr_index, fold_index):
-        evaluate_adience_model(Alxs, lr_index, fold_index, earth_mover_distance, softmax)
+        evaluate_adience_model(
+            evaluation_model=Alxs,
+            learning_rate_index=lr_index,
+            fold_index=fold_index,
+            loss_function=earth_mover_distance,
+            final_activation=softmax
+        )
 
 
 class AdienceXemd1:
@@ -271,7 +288,3 @@ class AdienceAemd3:
             distance_matrix=ground_distance_matrix,
             matrix_scaling_operations=100
             )
-
-
-if __name__ == "__main__":
-    pass
