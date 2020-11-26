@@ -41,6 +41,7 @@ class EvaluationModel(ABC, Model):
         self.learning_rate = learning_rate
         self.fold_index = fold_index
         self.dataset_name = dataset_name
+        self.loss_function = loss_function
         self.second_to_last_layer = None
 
         self._build_model(
@@ -104,7 +105,7 @@ class EvaluationModel(ABC, Model):
                 momentum=self._OPTIMIZER_MOMENTUM
             ),
             metrics=self._METRICS,
-            run_eagerly=True
+            run_eagerly=False
         )
 
     def test(self, **kwargs):
@@ -115,12 +116,14 @@ class EvaluationModel(ABC, Model):
             callbacks=[
                 self.emd_weight_head_start,
                 get_checkpoint_file(
+                    loss_name=self.loss_function.__name__,
                     data_set_name=self.dataset_name,
                     learning_rate=self.learning_rate,
                     model_name=self._MODEL_NAME,
                     fold_index=self.fold_index
                 ),
                 get_tensorboard_callback(
+                    loss_name=self.loss_function.__name__,
                     data_set_name=self.dataset_name,
                     learning_rate=self.learning_rate,
                     model_name=self._MODEL_NAME,
