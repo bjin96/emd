@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import List
 
 import pandas as pd
 import tensorflow as tf
@@ -47,13 +47,13 @@ def custom_data_loading(
     train_dataset = train_dataset.shuffle(100000)
     train_dataset = train_dataset.map(read_images, num_parallel_calls=AUTOTUNE)
     train_dataset = train_dataset.map(paper_preprocessing, num_parallel_calls=AUTOTUNE)
-    train_dataset = train_dataset.batch(32)
+    train_dataset = train_dataset.batch(32, drop_remainder=True)
     train_dataset = train_dataset.prefetch(AUTOTUNE)
     validation_dataset = tf.data.Dataset \
         .from_tensor_slices((validation_info['x_col'], validation_info['y_col'])) \
         .map(read_images, num_parallel_calls=AUTOTUNE) \
         .map(paper_preprocessing_validation, num_parallel_calls=AUTOTUNE) \
-        .batch(32) \
+        .batch(32, drop_remainder=True) \
         .prefetch(AUTOTUNE)
     return train_dataset, validation_dataset
 
