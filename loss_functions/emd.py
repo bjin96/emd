@@ -56,11 +56,12 @@ class EmdWeightHeadStart(Callback):
 
     def __init__(self):
         super(EmdWeightHeadStart, self).__init__()
-        self.emd_weight = False
+        self.emd_weight = 0
 
     def on_epoch_begin(self, epoch, logs={}):
+        print(f'emd weight is {self.emd_weight}')
         if epoch == 5:
-            self.emd_weight = True
+            self.emd_weight = 1
 
 
 def self_guided_earth_mover_distance(
@@ -78,19 +79,16 @@ def self_guided_earth_mover_distance(
             y_true=y_true,
             y_pred=y_pred
         )
-        if model.emd_weight_head_start.emd_weight:
-            self_guided_emd_loss = _calculate_self_guided_loss(
-                y_true=y_true,
-                y_pred=y_pred,
-                ground_distance_sensitivity=ground_distance_sensitivity,
-                ground_distance_bias=ground_distance_bias,
-                class_features=class_features
-            )
-            loss_function_relation = (cross_entropy_loss / self_guided_emd_loss) / 3.5
-            return cross_entropy_loss \
-                + model.emd_weight_head_start.emd_weight * loss_function_relation * self_guided_emd_loss
-        else:
-            return cross_entropy_loss
+        self_guided_emd_loss = _calculate_self_guided_loss(
+            y_true=y_true,
+            y_pred=y_pred,
+            ground_distance_sensitivity=ground_distance_sensitivity,
+            ground_distance_bias=ground_distance_bias,
+            class_features=class_features
+        )
+        # loss_function_relation = (cross_entropy_loss / self_guided_emd_loss) / 3.5
+        return cross_entropy_loss \
+            + model.emd_weight_head_start.emd_weight * 5.0 * self_guided_emd_loss
 
     return _self_guided_earth_mover_distance
 
