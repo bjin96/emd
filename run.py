@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import tensorflow as tf
 from tensorflow.keras.activations import softmax
 from tensorflow.keras.activations import linear
@@ -6,7 +8,7 @@ from evaluation.adience import evaluate_adience_model
 
 from loss_functions.crossentropy import cross_entropy
 from loss_functions.emd import earth_mover_distance, self_guided_earth_mover_distance, \
-    approximate_earth_mover_distance, load_ground_distance_matrix
+    approximate_earth_mover_distance
 from loss_functions.regression import l2_regression_loss
 from models.alx import Alxs
 from models.res import Res
@@ -85,7 +87,8 @@ class AdienceXemd1:
             loss_function=self_guided_earth_mover_distance,
             final_activation=softmax,
             ground_distance_sensitivity=1,
-            ground_distance_bias=0.5
+            ground_distance_bias=0.5,
+            ground_distance_path=Path(f'ground_distance/vggf/lr={lr_index}_fold={fold_index}')
         )
 
     @staticmethod
@@ -97,7 +100,8 @@ class AdienceXemd1:
             loss_function=self_guided_earth_mover_distance,
             final_activation=softmax,
             ground_distance_sensitivity=1,
-            ground_distance_bias=0.5
+            ground_distance_bias=0.5,
+            ground_distance_path=Path(f'ground_distance/res/lr={lr_index}_fold={fold_index}')
         )
 
     @staticmethod
@@ -109,7 +113,8 @@ class AdienceXemd1:
             loss_function=self_guided_earth_mover_distance,
             final_activation=softmax,
             ground_distance_sensitivity=1,
-            ground_distance_bias=0.5
+            ground_distance_bias=0.5,
+            ground_distance_path=Path(f'ground_distance/alxs/lr={lr_index}_fold={fold_index}')
         )
 
 
@@ -124,7 +129,8 @@ class AdienceXemd2:
             loss_function=self_guided_earth_mover_distance,
             final_activation=softmax,
             ground_distance_sensitivity=2,
-            ground_distance_bias=0.25
+            ground_distance_bias=0.25,
+            ground_distance_path=Path(f'ground_distance/vggf/lr={lr_index}_fold={fold_index}')
         )
 
     @staticmethod
@@ -136,7 +142,8 @@ class AdienceXemd2:
             loss_function=self_guided_earth_mover_distance,
             final_activation=softmax,
             ground_distance_sensitivity=2,
-            ground_distance_bias=0.25
+            ground_distance_bias=0.25,
+            ground_distance_path=Path(f'ground_distance/res/lr={lr_index}_fold={fold_index}')
         )
 
     @staticmethod
@@ -148,7 +155,8 @@ class AdienceXemd2:
             loss_function=self_guided_earth_mover_distance,
             final_activation=softmax,
             ground_distance_sensitivity=2,
-            ground_distance_bias=0.25
+            ground_distance_bias=0.25,
+            ground_distance_path=Path(f'ground_distance/alxs/lr={lr_index}_fold={fold_index}')
         )
 
 

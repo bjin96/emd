@@ -18,6 +18,7 @@ def evaluate_adience_model(
         fold_index: int,
         loss_function: Callable,
         final_activation: Union[softmax, linear],
+        ground_distance_path: Path = None,
         **loss_function_kwargs
 ):
     model = evaluation_model(
@@ -27,6 +28,7 @@ def evaluate_adience_model(
         loss_function=loss_function,
         learning_rate=LEARNING_RATES[learning_rate_index],
         fold_index=fold_index,
+        ground_distance_path=ground_distance_path,
         **loss_function_kwargs
     )
     evaluate_adience_fold(

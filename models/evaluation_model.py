@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import ClassVar, Callable, Union, List
 
 from tensorflow.keras.metrics import Metric
@@ -11,7 +12,7 @@ from tensorflow import TensorShape
 
 from data_handlers.data_set_info import DatasetName
 from evaluation.logging import get_checkpoint_file, get_tensorboard_callback
-from loss_functions.emd import EmdWeightHeadStart
+from loss_functions.emd import EmdWeightHeadStart, GroundDistanceManager, self_guided_earth_mover_distance
 from metrics.accuracy import one_off_accuracy
 
 
@@ -34,6 +35,7 @@ class EvaluationModel(ABC, Model):
             loss_function: Callable,
             learning_rate: float,
             fold_index: int,
+            ground_distance_path: Path,
             **loss_function_kwargs,
     ):
         super(EvaluationModel, self).__init__()
@@ -49,6 +51,7 @@ class EvaluationModel(ABC, Model):
             final_activation=final_activation
         )
         self._compile_model(
+            ground_distance_path=ground_distance_path,
             loss_function=loss_function,
             **loss_function_kwargs
         )
@@ -86,9 +89,12 @@ class EvaluationModel(ABC, Model):
     def _compile_model(
             self,
             loss_function: Callable,
+            ground_distance_path: Path,
             **loss_function_kwargs
     ):
-        self.emd_weight_head_start = EmdWeightHeadStart()
+        if loss_function == self_guided_earth_mover_distance:
+            self.emd_weight_head_start = EmdWeightHeadStart()
+            self.ground_distance_manager = GroundDistanceManager(ground_distance_path)
         lr_schedule = ExponentialDecay(
             self.learning_rate,
             decay_steps=429,
@@ -115,6 +121,7 @@ class EvaluationModel(ABC, Model):
         return self.fit(
             callbacks=[
                 self.emd_weight_head_start,
+                self.ground_distance_manager,
                 get_checkpoint_file(
                     loss_name=self.loss_function.__name__,
                     data_set_name=self.dataset_name,

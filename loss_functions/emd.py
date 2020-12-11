@@ -59,9 +59,34 @@ class EmdWeightHeadStart(Callback):
         self.emd_weight = 0
 
     def on_epoch_begin(self, epoch, logs={}):
-        print(f'emd weight is {self.emd_weight}')
-        if epoch == 5:
+        if epoch == 4:
             self.emd_weight = 1
+
+
+class GroundDistanceManager(Callback):
+
+    def __init__(
+            self,
+            file_path: Path
+    ):
+        super(GroundDistanceManager, self).__init__()
+        self.ground_distance_matrix = None
+
+        file_path.mkdir(parents=True, exist_ok=True)
+        self.file_path = file_path
+
+    def on_epoch_end(self, epoch, logs=None):
+        if self.ground_distance_matrix is not None:
+            self._save_ground_distance_matrix(epoch=epoch)
+
+    def _save_ground_distance_matrix(self, epoch: int) -> None:
+        np.save(
+            file=str(self.file_path) + f'/{epoch}',
+            arr=self.ground_distance_matrix
+        )
+
+    def load_ground_distance_matrix(self) -> np.array:
+        return np.load(str(self.file_path))
 
 
 def self_guided_earth_mover_distance(
@@ -84,7 +109,8 @@ def self_guided_earth_mover_distance(
             y_pred=y_pred,
             ground_distance_sensitivity=ground_distance_sensitivity,
             ground_distance_bias=ground_distance_bias,
-            class_features=class_features
+            class_features=class_features,
+            ground_distance_manager=model.ground_distance_manager
         )
         # loss_function_relation = (cross_entropy_loss / self_guided_emd_loss) / 3.5
         return cross_entropy_loss \
@@ -98,7 +124,8 @@ def _calculate_self_guided_loss(
         y_pred: K.placeholder,
         ground_distance_sensitivity: float,
         ground_distance_bias: float,
-        class_features: K.placeholder
+        class_features: K.placeholder,
+        ground_distance_manager: GroundDistanceManager
 ):
     class_length = 8
     batch_size = 32
@@ -111,7 +138,7 @@ def _calculate_self_guided_loss(
         estimated_distances=estimated_distances,
         class_length=class_length
     )
-    save_ground_distance_matrix(ground_distances)
+    ground_distance_manager.ground_distance_matrix = ground_distances
     cost_vectors = []
     for i in range(batch_size):
         cost_vectors.append(
@@ -156,16 +183,3 @@ def _calculate_ground_distances(
     elements_smaller = tf.convert_to_tensor(elements_smaller, dtype=tf.float32)
     normalized_distances = (1 / class_length) * elements_smaller
     return (normalized_distances + K.transpose(normalized_distances)) / 2
-
-
-def save_ground_distance_matrix(
-        ground_distance_matrix: K.placeholder
-) -> None:
-    np.save(
-        file=GROUND_DISTANCE_FILE,
-        arr=ground_distance_matrix
-    )
-
-
-def load_ground_distance_matrix() -> np.array:
-    return np.load(GROUND_DISTANCE_FILE)
