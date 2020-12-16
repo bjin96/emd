@@ -71,13 +71,57 @@ class GroundDistanceManager(Callback):
     ):
         super(GroundDistanceManager, self).__init__()
         self.ground_distance_matrix = None
+        self.epoch_class_features = []
+        self.epoch_labels = []
+        self.class_length = 8
 
         file_path.mkdir(parents=True, exist_ok=True)
         self.file_path = file_path
 
+    def set_labels(self, labels):
+        labels_tensor = tf.concat(labels, axis=0)
+        self.epoch_labels = labels_tensor
+
+    def on_batch_end(self, batch, logs=None):
+        self.epoch_class_features.append(self.model.second_to_last_layer)
+
     def on_epoch_end(self, epoch, logs=None):
-        if self.ground_distance_matrix is not None:
-            self._save_ground_distance_matrix(epoch=epoch)
+        self._update_ground_distance_matrix()
+        self._save_ground_distance_matrix(epoch=epoch)
+
+    def _update_ground_distance_matrix(self):
+        self.epoch_class_features = tf.concat(self.epoch_class_features, axis=0)
+        estimated_distances = self._estimate_distances()
+        self.ground_distance_matrix = self._calculate_ground_distances(
+            estimated_distances=estimated_distances
+        )
+        self.epoch_class_features = []
+        self.epoch_labels = []
+
+    def _estimate_distances(self) -> K.placeholder:
+        sample_means = K.mean(self.epoch_class_features, axis=-1)
+        class_labels = K.argmax(self.epoch_labels, axis=-1)
+        centroids = []
+        for i in range(self.class_length):
+            centroids.append(K.mean(sample_means[class_labels == i]))
+        centroids = tf.stack(centroids)
+        estimated_distances = []
+        for i in range(self.class_length):
+            estimated_distances.append(tf.norm(centroids[i] - centroids))
+        return tf.stack(estimated_distances)
+
+    def _calculate_ground_distances(
+            self,
+            estimated_distances: K.placeholder
+    ) -> K.placeholder:
+        sorted_indices = tf.argsort(estimated_distances)
+        elements_smaller = np.zeros((8, 8))
+        for i in range(8):
+            for j in range(8):
+                elements_smaller[i, sorted_indices[i, j]] = j
+        elements_smaller = tf.convert_to_tensor(elements_smaller, dtype=tf.float32)
+        normalized_distances = (1 / self.class_length) * elements_smaller
+        return (normalized_distances + K.transpose(normalized_distances)) / 2
 
     def _save_ground_distance_matrix(self, epoch: int) -> None:
         np.save(
@@ -97,24 +141,25 @@ def self_guided_earth_mover_distance(
 
     def _self_guided_earth_mover_distance(
             y_true: K.placeholder,
-            y_pred: K.placeholder
+            y_pred: K.placeholder,
     ) -> K.placeholder:
-        class_features = model.second_to_last_layer
         cross_entropy_loss = categorical_crossentropy(
             y_true=y_true,
             y_pred=y_pred
         )
-        self_guided_emd_loss = _calculate_self_guided_loss(
-            y_true=y_true,
-            y_pred=y_pred,
-            ground_distance_sensitivity=ground_distance_sensitivity,
-            ground_distance_bias=ground_distance_bias,
-            class_features=class_features,
-            ground_distance_manager=model.ground_distance_manager
-        )
-        # loss_function_relation = (cross_entropy_loss / self_guided_emd_loss) / 3.5
-        return cross_entropy_loss \
-            + model.emd_weight_head_start.emd_weight * 5.0 * self_guided_emd_loss
+        if model.emd_weight_head_start.emd_weight == 0:
+            return cross_entropy_loss
+        else:
+            self_guided_emd_loss = _calculate_self_guided_loss(
+                y_true=y_true,
+                y_pred=y_pred,
+                ground_distance_sensitivity=ground_distance_sensitivity,
+                ground_distance_bias=ground_distance_bias,
+                ground_distance_manager=model.ground_distance_manager
+            )
+            # loss_function_relation = (cross_entropy_loss / self_guided_emd_loss) / 3.5
+            return cross_entropy_loss \
+                + 5.0 * self_guided_emd_loss
 
     return _self_guided_earth_mover_distance
 
@@ -124,62 +169,16 @@ def _calculate_self_guided_loss(
         y_pred: K.placeholder,
         ground_distance_sensitivity: float,
         ground_distance_bias: float,
-        class_features: K.placeholder,
         ground_distance_manager: GroundDistanceManager
 ):
-    class_length = 8
     batch_size = 32
-    estimated_distances = _estimate_distances(
-        class_features=class_features,
-        y_true=y_true,
-        class_length=class_length
-    )
-    ground_distances = _calculate_ground_distances(
-        estimated_distances=estimated_distances,
-        class_length=class_length
-    )
-    ground_distance_manager.ground_distance_matrix = ground_distances
     cost_vectors = []
     for i in range(batch_size):
         cost_vectors.append(
-            ground_distances[:, K.argmax(y_true[i])] ** ground_distance_sensitivity + ground_distance_bias
+            ground_distance_manager.ground_distance_matrix[:, K.argmax(y_true[i])] ** ground_distance_sensitivity + ground_distance_bias
         )
     cost_vectors = tf.stack(cost_vectors)
     return K.sum(K.square(y_pred) * cost_vectors, axis=1)
 
 
-def _estimate_distances(
-        class_features: K.placeholder,
-        y_true: K.placeholder,
-        class_length: int
-) -> K.placeholder:
-    sample_means = K.mean(class_features, axis=-1)
-    class_labels = K.argmax(y_true, axis=-1)
-    centroids = []
-    for i in range(class_length):
-        centroids.append(K.mean(sample_means[class_labels == i]))
-    centroids = tf.stack(centroids)
-    # In case a class does not appear in the current batch, use centroid mean as centroid for that class
-    centroids = tf.where(
-        condition=tf.math.is_nan(centroids),
-        x=tf.reduce_mean(centroids[tf.logical_not(tf.math.is_nan(centroids))]),
-        y=centroids
-    )
-    estimated_distances = []
-    for i in range(class_length):
-        estimated_distances.append(K.square(centroids[i] - centroids))
-    return tf.stack(estimated_distances)
 
-
-def _calculate_ground_distances(
-        estimated_distances: K.placeholder,
-        class_length: int
-) -> K.placeholder:
-    sorted_indices = tf.argsort(estimated_distances)
-    elements_smaller = np.zeros((8, 8))
-    for i in range(8):
-        for j in range(8):
-            elements_smaller[i, sorted_indices[i, j]] = j
-    elements_smaller = tf.convert_to_tensor(elements_smaller, dtype=tf.float32)
-    normalized_distances = (1 / class_length) * elements_smaller
-    return (normalized_distances + K.transpose(normalized_distances)) / 2

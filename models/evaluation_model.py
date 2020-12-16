@@ -118,6 +118,8 @@ class EvaluationModel(ABC, Model):
         return self.predict(**kwargs)
 
     def train(self, **kwargs):
+        labels = [batch[1] for batch in kwargs['x']]
+        self.ground_distance_manager.set_labels(labels)
         return self.fit(
             callbacks=[
                 self.emd_weight_head_start,
