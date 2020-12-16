@@ -111,7 +111,7 @@ class GroundDistanceManager(Callback):
         centroids = tf.stack(centroids)
         estimated_distances = []
         for i in range(self.class_length):
-            estimated_distances.append(tf.norm(centroids[i] - centroids))
+            estimated_distances.append(tf.sqrt(tf.square(centroids[i] - centroids)))
         return tf.stack(estimated_distances)
 
     def _calculate_ground_distances(
