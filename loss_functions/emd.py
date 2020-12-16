@@ -99,11 +99,15 @@ class GroundDistanceManager(Callback):
         self.epoch_labels = []
 
     def _estimate_distances(self) -> K.placeholder:
-        sample_means = K.mean(self.epoch_class_features, axis=-1)
+        normalized_features = tf.norm(
+            tensor=self.epoch_class_features,
+            ord=1,
+            axis=-1
+        )
         class_labels = K.argmax(self.epoch_labels, axis=-1)
         centroids = []
         for i in range(self.class_length):
-            centroids.append(K.mean(sample_means[class_labels == i]))
+            centroids.append(K.mean(normalized_features[class_labels == i]))
         centroids = tf.stack(centroids)
         estimated_distances = []
         for i in range(self.class_length):
