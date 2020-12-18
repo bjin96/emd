@@ -96,7 +96,6 @@ class GroundDistanceManager(Callback):
             estimated_distances=estimated_distances
         )
         self.epoch_class_features = []
-        self.epoch_labels = []
 
     def _estimate_distances(self) -> K.placeholder:
         normalized_features = tf.norm(
