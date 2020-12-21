@@ -82,7 +82,7 @@ class GroundDistanceManager(Callback):
         labels_tensor = tf.concat(labels, axis=0)
         self.epoch_labels = labels_tensor
 
-    def on_batch_end(self, batch, logs=None):
+    def on_train_batch_end(self, batch, logs=None):
         self.epoch_class_features.append(self.model.second_to_last_layer)
 
     def on_epoch_end(self, epoch, logs=None):
@@ -98,31 +98,36 @@ class GroundDistanceManager(Callback):
         self.epoch_class_features = []
 
     def _estimate_distances(self) -> K.placeholder:
-        normalized_features = tf.norm(
-            tensor=self.epoch_class_features,
-            ord=1,
-            axis=-1
-        )
+        normalized_features = self.epoch_class_features / tf.reduce_sum(self.epoch_class_features, axis=1, keepdims=True)
         class_labels = K.argmax(self.epoch_labels, axis=-1)
         centroids = []
         for i in range(self.class_length):
-            centroids.append(K.mean(normalized_features[class_labels == i]))
+            centroids.append(K.mean(normalized_features[class_labels == i], axis=0))
         centroids = tf.stack(centroids)
+        tf.print(f'centroids: {centroids.numpy()}')
         estimated_distances = []
         for i in range(self.class_length):
-            estimated_distances.append(tf.sqrt(tf.square(centroids[i] - centroids)))
+            estimated_distances.append(
+                tf.norm(
+                    tensor=centroids - centroids[i],
+                    ord='euclidean',
+                    axis=-1
+                )
+            )
         return tf.stack(estimated_distances)
 
     def _calculate_ground_distances(
             self,
             estimated_distances: K.placeholder
     ) -> K.placeholder:
+        tf.print(f'estimated_distances: {estimated_distances.numpy()}')
         sorted_indices = tf.argsort(estimated_distances)
         elements_smaller = np.zeros((8, 8))
         for i in range(8):
             for j in range(8):
                 elements_smaller[i, sorted_indices[i, j]] = j
         elements_smaller = tf.convert_to_tensor(elements_smaller, dtype=tf.float32)
+        tf.print(f'elements_smaller: {elements_smaller.numpy()}')
         normalized_distances = (1 / self.class_length) * elements_smaller
         return (normalized_distances + K.transpose(normalized_distances)) / 2
 
@@ -161,8 +166,7 @@ def self_guided_earth_mover_distance(
                 ground_distance_manager=model.ground_distance_manager
             )
             # loss_function_relation = (cross_entropy_loss / self_guided_emd_loss) / 3.5
-            return cross_entropy_loss \
-                + 5.0 * self_guided_emd_loss
+            return cross_entropy_loss + 5.0 * self_guided_emd_loss
 
     return _self_guided_earth_mover_distance
 
