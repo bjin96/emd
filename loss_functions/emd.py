@@ -128,7 +128,7 @@ class GroundDistanceManager(Callback):
                 elements_smaller[i, sorted_indices[i, j]] = j
         elements_smaller = tf.convert_to_tensor(elements_smaller, dtype=tf.float32)
         tf.print(f'elements_smaller: {elements_smaller.numpy()}')
-        normalized_distances = (1 / self.class_length) * elements_smaller
+        normalized_distances = (1 / (self.class_length - 1)) * elements_smaller
         return (normalized_distances + K.transpose(normalized_distances)) / 2
 
     def _save_ground_distance_matrix(self, epoch: int) -> None:
