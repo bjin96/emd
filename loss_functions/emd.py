@@ -57,10 +57,20 @@ class EmdWeightHeadStart(Callback):
     def __init__(self):
         super(EmdWeightHeadStart, self).__init__()
         self.emd_weight = 0
+        self.epoch = 0
+        self.cross_entropy_loss_history = []
+        self.self_guided_emd_loss_history = []
 
     def on_epoch_begin(self, epoch, logs={}):
+        self.epoch = epoch
         if epoch == 4:
-            self.emd_weight = 1
+            cross_entropy_loss = tf.reduce_mean(
+                tf.convert_to_tensor(self.cross_entropy_loss_history, dtype=tf.float32)
+            )
+            self_guided_emd_loss = tf.reduce_mean(
+                tf.convert_to_tensor(self.self_guided_emd_loss_history, dtype=tf.float32)
+            )
+            self.emd_weight = (cross_entropy_loss / self_guided_emd_loss) / 3.5
 
 
 class GroundDistanceManager(Callback):
@@ -156,6 +166,16 @@ def self_guided_earth_mover_distance(
             y_pred=y_pred
         )
         if model.emd_weight_head_start.emd_weight == 0:
+            if model.emd_weight_head_start.epoch == 3:
+                self_guided_emd_loss = _calculate_self_guided_loss(
+                    y_true=y_true,
+                    y_pred=y_pred,
+                    ground_distance_sensitivity=ground_distance_sensitivity,
+                    ground_distance_bias=ground_distance_bias,
+                    ground_distance_manager=model.ground_distance_manager
+                )
+                model.emd_weight_head_start.cross_entropy_loss_history.append(cross_entropy_loss)
+                model.emd_weight_head_start.self_guided_emd_loss_history.append(self_guided_emd_loss)
             return cross_entropy_loss
         else:
             self_guided_emd_loss = _calculate_self_guided_loss(
@@ -165,8 +185,7 @@ def self_guided_earth_mover_distance(
                 ground_distance_bias=ground_distance_bias,
                 ground_distance_manager=model.ground_distance_manager
             )
-            # loss_function_relation = (cross_entropy_loss / self_guided_emd_loss) / 3.5
-            return cross_entropy_loss + 5.0 * self_guided_emd_loss
+            return cross_entropy_loss + model.emd_weight_head_start.emd_weight * self_guided_emd_loss
 
     return _self_guided_earth_mover_distance
 
