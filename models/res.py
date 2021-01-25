@@ -3,7 +3,7 @@ from typing import Union, ClassVar
 import numpy as np
 
 from tensorflow.keras.activations import softmax, linear
-from tensorflow.keras.layers import Conv2D, Layer, BatchNormalization, Dense, ReLU, AvgPool2D
+from tensorflow.keras.layers import Conv2D, Layer, BatchNormalization, Dense, ReLU, AvgPool2D, Flatten
 from tensorflow import TensorShape
 
 from models.evaluation_model import EvaluationModel
@@ -23,6 +23,7 @@ class Res(EvaluationModel):
             activation=ReLU,
             input_shape=(227, 227, 3)
         )
+        self.flatten = Flatten()
         self.dense3 = Dense(number_of_classes, activation=final_activation)
 
 
