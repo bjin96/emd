@@ -118,26 +118,27 @@ class EvaluationModel(ABC, Model):
         return self.predict(**kwargs)
 
     def train(self, **kwargs):
-        labels = [batch[1] for batch in kwargs['x']]
-        self.ground_distance_manager.set_labels(labels)
+        callbacks = [
+            get_checkpoint_file(
+                loss_name=self.loss_function.__name__,
+                data_set_name=self.dataset_name,
+                learning_rate=self.learning_rate,
+                model_name=self._MODEL_NAME,
+                fold_index=self.fold_index
+            ),
+            get_tensorboard_callback(
+                loss_name=self.loss_function.__name__,
+                data_set_name=self.dataset_name,
+                learning_rate=self.learning_rate,
+                model_name=self._MODEL_NAME,
+                fold_index=self.fold_index
+            )
+        ]
+        if hasattr(self, 'ground_distance_manager'):
+            labels = [batch[1] for batch in kwargs['x']]
+            self.ground_distance_manager.set_labels(labels)
+            callbacks.extend([self.emd_weight_head_start, self.ground_distance_manager])
         return self.fit(
-            callbacks=[
-                self.emd_weight_head_start,
-                self.ground_distance_manager,
-                get_checkpoint_file(
-                    loss_name=self.loss_function.__name__,
-                    data_set_name=self.dataset_name,
-                    learning_rate=self.learning_rate,
-                    model_name=self._MODEL_NAME,
-                    fold_index=self.fold_index
-                ),
-                get_tensorboard_callback(
-                    loss_name=self.loss_function.__name__,
-                    data_set_name=self.dataset_name,
-                    learning_rate=self.learning_rate,
-                    model_name=self._MODEL_NAME,
-                    fold_index=self.fold_index
-                )
-            ],
+            callbacks=callbacks,
             **kwargs
         )
