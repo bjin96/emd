@@ -1,11 +1,6 @@
-from typing import List
-
 import pandas as pd
 import tensorflow as tf
 
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-
-from data_handlers.adience import get_adience_info, ADIENCE_TRAIN_FOLDS_INFO_FILES, ADIENCE_VALIDATION_FOLDS_INFO_FILES
 from data_handlers.preprocessing import paper_preprocessing, paper_preprocessing_validation
 
 AUTOTUNE = tf.data.experimental.AUTOTUNE
@@ -13,36 +8,19 @@ X_COLUMN = 'x_col'
 Y_COLUMN = 'y_col'
 
 
-# def get_generators(
-#         train_info: pd.DataFrame,
-#         validation_info: pd.DataFrame,
-# ) -> Tuple[ImageDataGenerator, ImageDataGenerator]:
-#     train_generator = ImageDataGenerator(
-#         preprocessing_function=paper_preprocessing
-#     ).flow_from_dataframe(
-#         dataframe=train_info,
-#         target_size=(256, 256),
-#         x_col=X_COLUMN,
-#         y_col=Y_COLUMN
-#     )
-#     train_generator.class_indices = class_to_index
-#     validation_generator = ImageDataGenerator(
-#         preprocessing_function=paper_preprocessing_validation
-#     ).flow_from_dataframe(
-#         dataframe=validation_info,
-#         target_size=(256, 256),
-#         x_col=X_COLUMN,
-#         y_col=Y_COLUMN
-#     )
-#     validation_generator.class_indices = class_to_index
-#     return train_generator, validation_generator
-
-
 def custom_data_loading(
         train_info: pd.DataFrame,
         validation_info: pd.DataFrame
 ):
-    # batch earlier for performance improvement
+    """
+    Load training and validation dataset. Assumes standardized dataset.
+
+    :param train_info: pd.DataFrame containing information about the location of the training dataset.
+    :param validation_info: pd.DataFrame containing information about the location of the validation dataset.
+
+    :return: Tuple of tf.data.Dataset for training and validation.
+    """
+    # Could be batched earlier for performance improvement.
     train_dataset = tf.data.Dataset.from_tensor_slices((train_info['x_col'], train_info['y_col']))
     train_dataset = train_dataset.shuffle(100000)
     train_dataset = train_dataset.map(read_images, num_parallel_calls=AUTOTUNE)
@@ -77,6 +55,7 @@ def get_standardized_square_image(image):
 
 
 def standardize_all_images(train_info, validation_info):
+    """Standardizes images specified by the arguments."""
     all_info = pd.concat([train_info, validation_info], axis=0)
     for file in all_info['x_col']:
         image = tf.io.decode_jpeg(tf.io.read_file(file), channels=3)
@@ -85,6 +64,3 @@ def standardize_all_images(train_info, validation_info):
             filename=file.replace('faces/', 'test/'),
             contents=tf.io.encode_jpeg(tf.cast(standardized_image, tf.uint8)),
         )
-
-
-# standardize_all_images(*get_adience_info(ADIENCE_TRAIN_FOLDS_INFO_FILES[0], ADIENCE_VALIDATION_FOLDS_INFO_FILES[0]))

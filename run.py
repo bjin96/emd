@@ -8,7 +8,7 @@ from evaluation.adience import evaluate_adience_model
 
 from loss_functions.crossentropy import cross_entropy
 from loss_functions.emd import earth_mover_distance, self_guided_earth_mover_distance, \
-    approximate_earth_mover_distance
+    approximate_earth_mover_distance, GroundDistanceManager
 from loss_functions.regression import l2_regression_loss
 from models.alx import Alxs
 from models.res import Res
@@ -165,7 +165,8 @@ class AdienceAemd1:
 
     @staticmethod
     def vggf(lr_index, fold_index):
-        ground_distance_matrix = load_ground_distance_matrix()
+        ground_distance_manager = GroundDistanceManager(Path('ground_distances'))
+        ground_distance_matrix = ground_distance_manager.load_ground_distance_matrix('159')
         evaluate_adience_model(
             evaluation_model=Vggf,
             learning_rate_index=lr_index,
@@ -179,7 +180,8 @@ class AdienceAemd1:
 
     @staticmethod
     def res(lr_index, fold_index):
-        ground_distance_matrix = load_ground_distance_matrix()
+        ground_distance_manager = GroundDistanceManager(Path('ground_distances'))
+        ground_distance_matrix = ground_distance_manager.load_ground_distance_matrix('159')
         evaluate_adience_model(
             evaluation_model=Res,
             learning_rate_index=lr_index,
@@ -193,7 +195,8 @@ class AdienceAemd1:
 
     @staticmethod
     def alxs(lr_index, fold_index):
-        ground_distance_matrix = load_ground_distance_matrix()
+        ground_distance_manager = GroundDistanceManager(Path('ground_distances'))
+        ground_distance_matrix = ground_distance_manager.load_ground_distance_matrix('159')
         evaluate_adience_model(
             evaluation_model=Alxs,
             learning_rate_index=lr_index,
@@ -211,7 +214,8 @@ class AdienceAemd2:
 
     @staticmethod
     def vggf(lr_index, fold_index):
-        ground_distance_matrix = load_ground_distance_matrix()
+        ground_distance_manager = GroundDistanceManager(Path('ground_distances'))
+        ground_distance_matrix = ground_distance_manager.load_ground_distance_matrix('159')
         evaluate_adience_model(
             evaluation_model=Vggf,
             learning_rate_index=lr_index,
@@ -225,7 +229,8 @@ class AdienceAemd2:
 
     @staticmethod
     def res(lr_index, fold_index):
-        ground_distance_matrix = load_ground_distance_matrix()
+        ground_distance_manager = GroundDistanceManager(Path('ground_distances'))
+        ground_distance_matrix = ground_distance_manager.load_ground_distance_matrix('159')
         evaluate_adience_model(
             evaluation_model=Res,
             learning_rate_index=lr_index,
@@ -239,7 +244,8 @@ class AdienceAemd2:
 
     @staticmethod
     def alxs(lr_index, fold_index):
-        ground_distance_matrix = load_ground_distance_matrix()
+        ground_distance_manager = GroundDistanceManager(Path('ground_distances'))
+        ground_distance_matrix = ground_distance_manager.load_ground_distance_matrix('159')
         evaluate_adience_model(
             evaluation_model=Alxs,
             learning_rate_index=lr_index,
@@ -257,7 +263,8 @@ class AdienceAemd3:
 
     @staticmethod
     def vggf(lr_index, fold_index):
-        ground_distance_matrix = load_ground_distance_matrix()
+        ground_distance_manager = GroundDistanceManager(Path('ground_distances'))
+        ground_distance_matrix = ground_distance_manager.load_ground_distance_matrix('159')
         evaluate_adience_model(
             evaluation_model=Vggf,
             learning_rate_index=lr_index,
@@ -271,7 +278,8 @@ class AdienceAemd3:
 
     @staticmethod
     def res(lr_index, fold_index):
-        ground_distance_matrix = load_ground_distance_matrix()
+        ground_distance_manager = GroundDistanceManager(Path('ground_distances'))
+        ground_distance_matrix = ground_distance_manager.load_ground_distance_matrix('159')
         evaluate_adience_model(
             evaluation_model=Res,
             learning_rate_index=lr_index,
@@ -285,7 +293,8 @@ class AdienceAemd3:
 
     @staticmethod
     def alxs(lr_index, fold_index):
-        ground_distance_matrix = load_ground_distance_matrix()
+        ground_distance_manager = GroundDistanceManager(Path('ground_distances'))
+        ground_distance_matrix = ground_distance_manager.load_ground_distance_matrix('159')
         evaluate_adience_model(
             evaluation_model=Alxs,
             learning_rate_index=lr_index,

@@ -53,6 +53,7 @@ def approximate_earth_mover_distance(
 
 
 class EmdWeightHeadStart(Callback):
+    """Class for implementing delayed inclusion of the distance-based regularization term for the self-guided emd."""
 
     def __init__(self):
         super(EmdWeightHeadStart, self).__init__()
@@ -74,6 +75,7 @@ class EmdWeightHeadStart(Callback):
 
 
 class GroundDistanceManager(Callback):
+    """Class for managing the generation and update of the ground distance matrix."""
 
     def __init__(
             self,
@@ -108,7 +110,8 @@ class GroundDistanceManager(Callback):
         self.epoch_class_features = []
 
     def _estimate_distances(self) -> K.placeholder:
-        normalized_features = self.epoch_class_features / tf.reduce_sum(self.epoch_class_features, axis=1, keepdims=True)
+        normalized_features = self.epoch_class_features \
+                              / tf.reduce_sum(self.epoch_class_features, axis=1, keepdims=True)
         class_labels = K.argmax(self.epoch_labels, axis=-1)
         centroids = []
         for i in range(self.class_length):
@@ -147,8 +150,8 @@ class GroundDistanceManager(Callback):
             arr=self.ground_distance_matrix
         )
 
-    def load_ground_distance_matrix(self) -> np.array:
-        return np.load(str(self.file_path))
+    def load_ground_distance_matrix(self, epoch) -> np.array:
+        return np.load(str(self.file_path) + f'/{epoch}.npy')
 
 
 def self_guided_earth_mover_distance(
@@ -156,6 +159,7 @@ def self_guided_earth_mover_distance(
         ground_distance_sensitivity: float,
         ground_distance_bias: float
 ) -> Callable:
+    """Wrapper for the self-guided earth mover distance loss function."""
 
     def _self_guided_earth_mover_distance(
             y_true: K.placeholder,
@@ -201,7 +205,9 @@ def _calculate_self_guided_loss(
     cost_vectors = []
     for i in range(batch_size):
         cost_vectors.append(
-            ground_distance_manager.ground_distance_matrix[:, K.argmax(y_true[i])] ** ground_distance_sensitivity + ground_distance_bias
+            ground_distance_manager.ground_distance_matrix[:, K.argmax(y_true[i])]
+            ** ground_distance_sensitivity
+            + ground_distance_bias
         )
     cost_vectors = tf.stack(cost_vectors)
     return K.sum(K.square(y_pred) * cost_vectors, axis=1)

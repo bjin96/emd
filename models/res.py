@@ -10,6 +10,9 @@ from models.evaluation_model import EvaluationModel
 
 
 class Res(EvaluationModel):
+    """
+    RES model. Reference: S. Zagoruyko and N. Komodakis. "Wide residual networks", 2016.
+    """
 
     _MODEL_NAME: ClassVar[str] = 'RES'
 

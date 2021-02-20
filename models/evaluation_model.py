@@ -17,6 +17,7 @@ from metrics.accuracy import one_off_accuracy
 
 
 class EvaluationModel(ABC, Model):
+    """Base class for the models to be evaluated."""
 
     _OPTIMIZER: ClassVar[Optimizer] = SGD
     _OPTIMIZER_MOMENTUM: ClassVar[float] = 0.98

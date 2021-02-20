@@ -2,7 +2,7 @@ from typing import Union, ClassVar
 
 from tensorflow.keras import Input
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Conv2D, MaxPool2D, Flatten, Dense, Dropout, Layer,Concatenate
+from tensorflow.keras.layers import Conv2D, MaxPool2D, Flatten, Dense, Dropout, Layer, Concatenate
 from tensorflow.keras.activations import relu, softmax, linear
 from tensorflow.keras.regularizers import l2
 from tensorflow.python.ops.nn_ops import local_response_normalization
@@ -11,6 +11,9 @@ from models.evaluation_model import EvaluationModel
 
 
 class Alxs(EvaluationModel):
+    """
+    ALXs model. Reference: E. Eidinger, R. Enbar, and T. Hassner. "Age andgender estimation of unfiltered faces", 2014.
+    """
 
     _MODEL_NAME: ClassVar[str] = 'ALXs'
 
@@ -85,6 +88,10 @@ class Alxs(EvaluationModel):
 
 
 class Alx(EvaluationModel):
+    """
+    ALX model. Reference: A. Krizhevsky, I. Sutskever, and G. E. Hinton. "Imagenet classification with deep
+    convolutional neural networks", 2012.
+    """
 
     _MODEL_NAME: ClassVar[str] = 'ALX'
 

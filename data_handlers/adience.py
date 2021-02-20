@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import List, Tuple
 
 import pandas as pd
-import numpy as np
 
 
 FOLD_DIR = os.path.dirname(__file__) / Path('../datasets/adience/')
@@ -22,7 +21,9 @@ VALIDATION_1_INFO_FILE = FOLD_3_FILE
 VALIDATION_2_INFO_FILE = FOLD_2_FILE
 VALIDATION_3_INFO_FILE = FOLD_1_FILE
 VALIDATION_4_INFO_FILE = FOLD_0_FILE
-ADIENCE_TRAIN_FOLDS_INFO_FILES = [TRAIN_0_INFO_FILES, TRAIN_1_INFO_FILES, TRAIN_2_INFO_FILES, TRAIN_3_INFO_FILES, TRAIN_4_INFO_FILES]
+ADIENCE_TRAIN_FOLDS_INFO_FILES = [
+    TRAIN_0_INFO_FILES, TRAIN_1_INFO_FILES, TRAIN_2_INFO_FILES, TRAIN_3_INFO_FILES, TRAIN_4_INFO_FILES
+]
 ADIENCE_VALIDATION_FOLDS_INFO_FILES = [
     VALIDATION_0_INFO_FILE, VALIDATION_1_INFO_FILE, VALIDATION_2_INFO_FILE, VALIDATION_3_INFO_FILE,
     VALIDATION_4_INFO_FILE
@@ -42,18 +43,27 @@ class_to_index = {
     '(60, 100)': 7
 }
 
+
 def get_adience_info(
         train_fold_info_files: List[Path],
         validation_fold_info_file: Path
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Construct pd.DataFrames with information about the dataset files from CSV files.
+
+    :param train_fold_info_files: CSV files containing information about the training dataset folds.
+    :param validation_fold_info_file:  CSV file containing information about the validation dataset.
+
+    :return: Tuple of pd.DataFrames containing information about the dataset.
+    """
     train_info = []
     for train_info_file in train_fold_info_files:
-        train_info.append(preprocess_info_file(train_info_file))
-    validation_info = preprocess_info_file(validation_fold_info_file)
+        train_info.append(_preprocess_info_file(train_info_file))
+    validation_info = _preprocess_info_file(validation_fold_info_file)
     return pd.concat(train_info), validation_info
 
 
-def preprocess_info_file(
+def _preprocess_info_file(
         info_file: Path
 ) -> pd.DataFrame:
     info = pd.read_csv(
@@ -61,7 +71,7 @@ def preprocess_info_file(
         sep='\t'
     )
     info = info.loc[info['age'].isin(ADIENCE_CLASSES)]
-    info['x_col'] = build_image_path_series(info=info)
+    info['x_col'] = _build_image_path_series(info=info)
     info['y_col'] = info['age'].map(lambda age: class_to_index[age])
     return info \
         .drop(
@@ -72,7 +82,7 @@ def preprocess_info_file(
         .dropna()
 
 
-def build_image_path_series(
+def _build_image_path_series(
         info: pd.DataFrame
 ) -> pd.Series:
     return pd.Series(

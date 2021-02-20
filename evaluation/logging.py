@@ -17,6 +17,7 @@ def get_tensorboard_callback(
         model_name: str,
         fold_index: int
 ) -> TensorBoard:
+    """Function for adding logging to TensorBoard."""
     current_datetime = datetime.now().strftime("%Y%m%d-%H%M%S")
     data_set_log_dir = \
         LOG_DIR / Path(data_set_name.value) / Path(model_name) / Path(loss_name) / Path(str(fold_index)) \
@@ -34,6 +35,7 @@ def get_checkpoint_file(
         model_name: str,
         fold_index: int
 ) -> ModelCheckpoint:
+    """Function for generating checkpoints during training."""
     current_datetime = datetime.now().strftime("%Y%m%d-%H%M%S")
     data_set_checkpoint_dir = \
         CHECKPOINT_DIR / Path(data_set_name.value) / Path(model_name) / Path(loss_name) \

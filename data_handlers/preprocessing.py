@@ -27,6 +27,7 @@ def process_custom_preprocessing(
 
     return _process_custom_preprocessing
 
+
 @tf.function
 def paper_preprocessing(img, label):
     # crop
@@ -35,26 +36,23 @@ def paper_preprocessing(img, label):
     ioff = np.random.randint(0, icut + 1)
     joff = np.random.randint(0, jcut + 1)
     img = img[ioff: ioff + 256 - icut, joff: joff + 256 - jcut]
-    # tf.io.write_file('step1_crop.jpg', tf.io.encode_jpeg(tf.cast(img, tf.uint8)))
 
     # adjust color
     adj_range = 0.15
     rgb_mean = tf.cast(tf.reduce_mean(img, axis=(0, 1), keepdims=True), tf.float32)
     adj_magn = tf.random.uniform(minval=1 - adj_range, maxval=1 + adj_range, shape=(1, 1, 3))
     img = tf.cast(img, tf.float32)
-    img = tf.clip_by_value((img - rgb_mean) * adj_magn + rgb_mean + tf.random.uniform((1, 1, 3), -1.0, 1.0) * 20, 0.0, 255.0)
-    # tf.io.write_file('step2_adjust_color.jpg', tf.io.encode_jpeg(tf.cast(img, tf.uint8)))
+    img = tf.clip_by_value(
+        (img - rgb_mean) * adj_magn + rgb_mean + tf.random.uniform((1, 1, 3), -1.0, 1.0) * 20, 0.0, 255.0
+    )
 
     # mirror
     if tf.random.uniform([1])[0] < 0.5:
         img = img[:, ::-1]
-        # tf.io.write_file('step3_mirror.jpg', tf.io.encode_jpeg(tf.cast(img, tf.uint8)))
-
     image_size = [227, 227]
 
     # scaling
     if tf.random.uniform([1])[0] < 0.5:
-        # tf.io.write_file('step4_scaling.jpg', tf.io.encode_jpeg(tf.cast(img, tf.uint8)))
 
         iscale = 2 * (tf.random.uniform([1])[0] - 0.5) * 0.10 + 1.0
         jscale = 2 * (tf.random.uniform([1])[0] - 0.5) * 0.10 + 1.0
@@ -70,10 +68,8 @@ def paper_preprocessing(img, label):
     if tf.random.uniform([1])[0] < 0.9:
         rotate_angle = (tf.random.uniform([1])[0] - 0.5) * 2 * 20.0
         img = tfa.image.rotate(img, rotate_angle * np.pi / 180.)
-        # tf.io.write_file('step6_rotate.jpg', tf.io.encode_jpeg(tf.cast(img, tf.uint8)))
 
     img = zero_centering(img, image_size)
-    # tf.io.write_file('step7_zero_centered.jpg', tf.io.encode_jpeg(tf.cast(img, tf.uint8)))
 
     img = (img - 127.0) / 127.0
 

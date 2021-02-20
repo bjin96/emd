@@ -21,6 +21,19 @@ def evaluate_adience_model(
         ground_distance_path: Path = None,
         **loss_function_kwargs
 ):
+    """
+    Function to evaluate a model with the specified parameters on the Adience dataset.
+
+    :param evaluation_model: Model to be evaluated.
+    :param learning_rate_index: Index of the learning rate with which to train. Learning rates are defined in
+        emd/models/constants.py.
+    :param fold_index: Index of the fold from the cross-validation partitioning on which to train the model.
+    :param loss_function: Loss function with which to train the model.
+    :param final_activation: Final activation to use for the final layer. Must be one of softmax or linear.
+    :param ground_distance_path: Path where the ground distance matrices should be stored if the loss function is
+        self-guided emd.
+    :param loss_function_kwargs: Additional parameters to pass to the loss function.
+    """
     model = evaluation_model(
         number_of_classes=len(ADIENCE_CLASSES),
         dataset_name=DatasetName.ADIENCE,
@@ -31,14 +44,14 @@ def evaluate_adience_model(
         ground_distance_path=ground_distance_path,
         **loss_function_kwargs
     )
-    evaluate_adience_fold(
+    _evaluate_adience_fold(
         model=model,
         train_fold_info_files=ADIENCE_TRAIN_FOLDS_INFO_FILES[fold_index],
         validation_fold_info_file=ADIENCE_VALIDATION_FOLDS_INFO_FILES[fold_index]
     )
 
 
-def evaluate_adience_fold(
+def _evaluate_adience_fold(
         model: EvaluationModel,
         train_fold_info_files: List[Path],
         validation_fold_info_file: Path
@@ -51,14 +64,14 @@ def evaluate_adience_fold(
         train_info=train_info,
         validation_info=validation_info
     )
-    evaluate(
+    _evaluate(
         model=model,
         train_generator=train_generator,
         validation_generator=validation_generator
     )
 
 
-def evaluate(
+def _evaluate(
         model: EvaluationModel,
         train_generator: ImageDataGenerator,
         validation_generator: ImageDataGenerator
